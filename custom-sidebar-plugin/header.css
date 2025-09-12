@@ -12,7 +12,7 @@
 .cp-header__row { width: 100%; display: grid; grid-template-columns: auto minmax(280px, 720px) auto; align-items: center; gap: 12px; padding: 0 12px; }
 .cp-header__logo { display: none; justify-self: center; }
 .cp-header__logo--mobile { display: none; }
-.cp-header__logo img { height: 40px; width: auto; display: block; }
+.cp-header__logo img { height: 60px; width: auto; display: block; }
 
 .cp-header__search-form { display: flex; align-items: center; gap: 8px; max-width: 720px; width: 100%; margin: 0 auto; font: inherit; grid-column: 2; justify-self: stretch; position: relative; }
 .cp-header__search-input { flex: 1; height: 40px; border-radius: 10px; border: 1px solid rgba(255,255,255,.1); padding: 0 12px; background: #1a1a1a; color: var(--cp-sb-fg); font-family: 'Gilroy', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; font-weight: 600; }

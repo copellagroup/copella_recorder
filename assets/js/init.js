@@ -88,7 +88,6 @@ document.addEventListener('DOMContentLoaded', function(){
       
       // Инициализируем новые модули
       CopellaStats.init();
-      CopellaNowPlaying.init();
       
       // Обработчик кнопки "Назад"
       var backBtn = document.getElementById('backBtn');

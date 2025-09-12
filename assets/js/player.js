@@ -63,22 +63,73 @@ window.CopellaPlayer = (function(){
     CopellaDOM.playerPanel.classList.remove('error');
     CopellaDOM.playerPanel.classList.add('loading');
     var streamUrl = station.url;
-    if (Hls.isSupported() && (streamUrl.indexOf('.m3u8') > -1 || streamUrl.indexOf('.m3u') > -1)) {
-      try { CopellaState.hls.destroy(); } catch(e) {}
-      CopellaState.hls = new Hls();
-      CopellaState.hls.loadSource(streamUrl);
-      CopellaState.hls.attachMedia(CopellaDOM.audioPlayer);
-      CopellaState.hls.on(Hls.Events.MANIFEST_PARSED, function(){ CopellaDOM.audioPlayer.play().catch(console.error); });
-      CopellaState.hls.on(Hls.Events.ERROR, function(event, data){ if (data.fatal) playNatively(streamUrl); });
-      CopellaState.hls.on(Hls.Events.FRAG_PARSING_METADATA, function(event, data){ try {
+    
+    // Улучшенная логика поддержки различных типов потоков
+    if (isHlsStream(streamUrl)) {
+      playHlsStream(streamUrl);
+    } else if (isIcecastStream(streamUrl)) {
+      playIcecastStream(streamUrl);
+    } else {
+      playNatively(streamUrl);
+    }
+    CopellaStorage.setLastPlayed(index);
+  }
+
+  function isHlsStream(url) {
+    return Hls.isSupported() && (url.indexOf('.m3u8') > -1 || url.indexOf('.m3u') > -1);
+  }
+
+  function isIcecastStream(url) {
+    return url.indexOf('icecast') > -1 || url.indexOf('shoutcast') > -1 || url.indexOf('stream') > -1;
+  }
+
+  function playHlsStream(streamUrl) {
+    try { 
+      CopellaState.hls.destroy(); 
+    } catch(e) {}
+    CopellaState.hls = new Hls({
+      enableWorker: true,
+      lowLatencyMode: true,
+      backBufferLength: 90
+    });
+    CopellaState.hls.loadSource(streamUrl);
+    CopellaState.hls.attachMedia(CopellaDOM.audioPlayer);
+    CopellaState.hls.on(Hls.Events.MANIFEST_PARSED, function(){ 
+      CopellaDOM.audioPlayer.play().catch(function(err) {
+        console.error('HLS play failed:', err);
+        playNatively(streamUrl);
+      }); 
+    });
+    CopellaState.hls.on(Hls.Events.ERROR, function(event, data){ 
+      console.error('HLS error:', data);
+      if (data.fatal) {
+        CopellaUI.showToast('Ошибка HLS потока, пробуем нативное воспроизведение', 'warning');
+        playNatively(streamUrl); 
+      }
+    });
+    CopellaState.hls.on(Hls.Events.FRAG_PARSING_METADATA, function(event, data){ 
+      try {
         if (data.samples && data.samples.length > 0 && data.samples[0].data) {
           var metadataText = new TextDecoder('utf-8').decode(data.samples[0].data).trim();
           var titleMatch = metadataText.match(/StreamTitle='([^']*)';/);
           if (titleMatch && titleMatch[1]) updateNowPlayingUI(titleMatch[1]);
         }
-      } catch(_){} });
-    } else { playNatively(streamUrl); }
-    CopellaStorage.setLastPlayed(index);
+      } catch(_){}
+    });
+  }
+
+  function playIcecastStream(streamUrl) {
+    try { 
+      CopellaState.hls.destroy(); 
+    } catch(e) {}
+    CopellaDOM.audioPlayer.crossOrigin = 'anonymous';
+    CopellaDOM.audioPlayer.src = streamUrl;
+    CopellaDOM.audioPlayer.load();
+    CopellaDOM.audioPlayer.play().catch(function(err) {
+      console.error('Icecast play failed:', err);
+      CopellaUI.showToast('Ошибка воспроизведения потока', 'error');
+      CopellaDOM.playerPanel.classList.add('error');
+    });
   }
 
   function playNatively(url) { try { CopellaState.hls.destroy(); } catch(e) {} CopellaDOM.audioPlayer.src = url; CopellaDOM.audioPlayer.load(); CopellaDOM.audioPlayer.play().catch(console.error); }
