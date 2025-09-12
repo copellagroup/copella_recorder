@@ -56,15 +56,8 @@ add_action('wp_enqueue_scripts', function () {
     $css_sidebar = $url . 'sidebar.css';
     wp_enqueue_style('cp-sidebar-nextgen', $css_sidebar, array(), file_exists($base.'sidebar.css') ? filemtime($base.'sidebar.css') : null);
 
-    // Header CSS - выбираем нужный в зависимости от страницы
-    if ($is_recorder_page) {
-        // Специальный хедер для copella-recorder
-        $css_header = $url . 'header-recorder.css';
-        if (file_exists($base.'header-recorder.css')) {
-            wp_enqueue_style('cp-header-recorder', $css_header, array('cp-sidebar-nextgen'), filemtime($base.'header-recorder.css'));
-        }
-    } else {
-        // Обычный хедер
+    // Header CSS - загружаем только если НЕ страница copella-recorder
+    if (!$is_recorder_page) {
         $css_header = $url . 'header.css';
         if (file_exists($base.'header.css')) {
             wp_enqueue_style('cp-header-nextgen', $css_header, array('cp-sidebar-nextgen'), filemtime($base.'header.css'));
@@ -83,17 +76,8 @@ add_action('wp_enqueue_scripts', function () {
     if (function_exists('wp_script_add_data')) { wp_script_add_data('cp-sidebar-nextgen', 'strategy', 'defer'); }
     wp_enqueue_script('cp-sidebar-nextgen');
 
-    // Header JS - выбираем нужный в зависимости от страницы
-    if ($is_recorder_page) {
-        // Специальный JavaScript для copella-recorder
-        $js_header = $url . 'header-recorder.js';
-        if (file_exists($base.'header-recorder.js')) {
-            wp_register_script('cp-header-recorder', $js_header, array(), filemtime($base.'header-recorder.js'), array('in_footer' => true));
-            if (function_exists('wp_script_add_data')) { wp_script_add_data('cp-header-recorder', 'strategy', 'defer'); }
-            wp_enqueue_script('cp-header-recorder');
-        }
-    } else {
-        // Обычный JavaScript для хедера
+    // Header JS - загружаем только если НЕ страница copella-recorder
+    if (!$is_recorder_page) {
         $js_header = $url . 'header.js';
         if (file_exists($base.'header.js')) {
             wp_register_script('cp-header-nextgen', $js_header, array(), filemtime($base.'header.js'), array('in_footer' => true));
@@ -109,11 +93,8 @@ add_action('wp_body_open', function() {
     // Проверяем, находимся ли мы на странице copella-recorder
     $is_recorder_page = isCopellaRecorderPage();
     
-    if ($is_recorder_page) {
-        // Показываем специальный хедер для copella-recorder
-        include __DIR__ . '/header-template-recorder.php';
-    } else {
-        // Показываем обычный хедер
+    // Показываем обычный хедер только если НЕ страница copella-recorder
+    if (!$is_recorder_page) {
         include __DIR__ . '/header-template.php';
     }
     
