@@ -61,5 +61,14 @@
     <div id="recordingsModal" class="modal fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex justify-center items-center p-4 opacity-0 pointer-events-none transition-opacity duration-300"></div>
     <div id="settingsModal" class="modal fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex justify-center items-center p-4 opacity-0 pointer-events-none transition-opacity duration-300"></div>
     <div id="toastContainer" class="fixed bottom-0 right-0 left-0 sm:left-auto sm:bottom-4 sm:right-4 z-[100] p-4 flex flex-col items-center sm:items-end gap-3 pointer-events-none"></div>
+    
+    <!-- Водяной знак для бесплатной версии -->
+    <div class="fixed bottom-4 left-4 z-40 pointer-events-none">
+        <div class="bg-black/50 backdrop-blur-sm rounded-lg px-3 py-2 text-white/70 text-sm font-gilroy">
+            <span>Powered by </span>
+            <a href="https://copella.live" target="_blank" class="text-white hover:text-accent transition-colors pointer-events-auto">copella.live</a>
+        </div>
+    </div>
+    
     <audio id="audioPlayer" crossorigin="anonymous" class="hidden"></audio>
 </div>

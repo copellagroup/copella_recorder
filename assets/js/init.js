@@ -42,6 +42,12 @@ document.addEventListener('DOMContentLoaded', function(){
     });
   }
   function addStationFromApi(apiStation, btn) {
+    // Ограничение для бесплатной версии - максимум 5 станций
+    if (CopellaState.stations.length >= 5) {
+      CopellaUI.showToast('Бесплатная версия ограничена 5 станциями. Перейдите на copella.live для полной версии!', 'warning', 5000);
+      return;
+    }
+    
     var url = apiStation.url_resolved || apiStation.url;
     var newStation = { name: apiStation.name.trim(), url: url, icon: apiStation.favicon || '' };
     CopellaState.stations.push(newStation);
