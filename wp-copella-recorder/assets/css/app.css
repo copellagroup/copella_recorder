@@ -1,0 +1,14 @@
+* { -webkit-tap-highlight-color: transparent; }
+input[type="search"]::-webkit-search-cancel-button { display: none; }
+.modal .modal-content { max-height: 90vh; }
+#stationListContainer::after,
+#apiSearchResultsContainer::after,
+#recordingsList::after,
+#scheduleList::after { content: ''; display: block; height: 6rem; }
+.volume-slider-container { transition: opacity 0.2s, visibility 0.2s; }
+.player-controls .volume-control-wrapper:hover .volume-slider-container { opacity: 1; visibility: visible; }
+@media (min-width: 640px) { .volume-slider-container { opacity: 0; visibility: hidden; } }
+input[type=range] { -webkit-appearance: none; background: transparent; }
+input[type=range]::-webkit-slider-runnable-track { height: 4px; background: rgba(255,255,255,0.2); border-radius: 4px; }
+input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; margin-top: -6px; width: 16px; height: 16px; background: #fff; border-radius: 50%; cursor: pointer; }
+html, body { background-color: #0A0A0A; }
