@@ -72,10 +72,11 @@ document.addEventListener('DOMContentLoaded', function(){
       CopellaDOM.settingsBtn.onclick = function(){ CopellaUI.haptic(); CopellaModals.openSettingsModal(); };
       CopellaDOM.exportBtn.onclick = function(){ CopellaUI.haptic(); CopellaExport.openExportModal(); };
       CopellaDOM.statsBtn.onclick = function(){ CopellaUI.haptic(); CopellaStats.openStatsModal(); };
+      CopellaDOM.streamInfoBtn.onclick = function(){ CopellaUI.haptic(); CopellaStreamInfo.openStreamInfoModal(); };
       
       // Инициализируем новые модули
       CopellaStats.init();
-      CopellaGenres.addGenreFilter();
+      CopellaNowPlaying.init();
       
       // Обработчик кнопки "Назад"
       var backBtn = document.getElementById('backBtn');
