@@ -41,10 +41,39 @@ window.CopellaStations = (function(){
     var dragHandle = item.querySelector('.drag-handle');
     
     // Desktop drag & drop
-    item.addEventListener('dragstart', function(e){ if (!dragHandle.contains(e.target)) { e.preventDefault(); return; } CopellaState.draggedItemIndex = index; setTimeout(function(){ item.classList.add('opacity-50'); }, 0); });
-    item.addEventListener('dragend', function(){ item.classList.remove('opacity-50'); });
-    item.addEventListener('dragover', function(e){ e.preventDefault(); });
-    item.addEventListener('drop', function(e){ e.preventDefault(); var droppedOnIndex = index; if (CopellaState.draggedItemIndex === droppedOnIndex) return; var draggedItem = CopellaState.stations.splice(CopellaState.draggedItemIndex, 1)[0]; CopellaState.stations.splice(droppedOnIndex, 0, draggedItem); if (CopellaState.currentStationIndex === CopellaState.draggedItemIndex) CopellaState.currentStationIndex = droppedOnIndex; else if (CopellaState.draggedItemIndex < CopellaState.currentStationIndex && droppedOnIndex >= CopellaState.currentStationIndex) CopellaState.currentStationIndex--; else if (CopellaState.draggedItemIndex > CopellaState.currentStationIndex && droppedOnIndex <= CopellaState.currentStationIndex) CopellaState.currentStationIndex++; CopellaStorage.saveStations(); renderList(CopellaDOM.stationSearchInput.value); });
+    dragHandle.addEventListener('dragstart', function(e){ 
+      CopellaState.draggedItemIndex = index; 
+      setTimeout(function(){ item.classList.add('opacity-50'); }, 0); 
+    });
+    
+    item.addEventListener('dragend', function(){ 
+      item.classList.remove('opacity-50'); 
+      CopellaState.draggedItemIndex = null;
+    });
+    
+    item.addEventListener('dragover', function(e){ 
+      e.preventDefault(); 
+    });
+    
+    item.addEventListener('drop', function(e){ 
+      e.preventDefault(); 
+      var droppedOnIndex = index; 
+      if (CopellaState.draggedItemIndex === null || CopellaState.draggedItemIndex === droppedOnIndex) return; 
+      
+      var draggedItem = CopellaState.stations.splice(CopellaState.draggedItemIndex, 1)[0]; 
+      CopellaState.stations.splice(droppedOnIndex, 0, draggedItem); 
+      
+      if (CopellaState.currentStationIndex === CopellaState.draggedItemIndex) {
+        CopellaState.currentStationIndex = droppedOnIndex;
+      } else if (CopellaState.draggedItemIndex < CopellaState.currentStationIndex && droppedOnIndex >= CopellaState.currentStationIndex) {
+        CopellaState.currentStationIndex--;
+      } else if (CopellaState.draggedItemIndex > CopellaState.currentStationIndex && droppedOnIndex <= CopellaState.currentStationIndex) {
+        CopellaState.currentStationIndex++;
+      } 
+      
+      CopellaStorage.saveStations(); 
+      renderList(CopellaDOM.stationSearchInput.value); 
+    });
     
     // Mobile touch drag & drop
     var touchStartY = 0;
