@@ -39,10 +39,80 @@ window.CopellaStations = (function(){
     var deleteBtn = item.querySelector('.delete-btn');
     deleteBtn.onclick = function(e){ e.stopPropagation(); CopellaUI.haptic(); deleteBtn.innerHTML = CopellaConfig.ICONS.confirm; deleteBtn.classList.add('text-record'); var original = deleteBtn.onclick; deleteBtn.onclick = function(ev){ ev.stopPropagation(); deleteStation(index); }; setTimeout(function(){ deleteBtn.innerHTML = CopellaConfig.ICONS.trash; deleteBtn.classList.remove('text-record'); deleteBtn.onclick = original; }, 3000); };
     var dragHandle = item.querySelector('.drag-handle');
+    
+    // Desktop drag & drop
     item.addEventListener('dragstart', function(e){ if (!dragHandle.contains(e.target)) { e.preventDefault(); return; } CopellaState.draggedItemIndex = index; setTimeout(function(){ item.classList.add('opacity-50'); }, 0); });
     item.addEventListener('dragend', function(){ item.classList.remove('opacity-50'); });
     item.addEventListener('dragover', function(e){ e.preventDefault(); });
     item.addEventListener('drop', function(e){ e.preventDefault(); var droppedOnIndex = index; if (CopellaState.draggedItemIndex === droppedOnIndex) return; var draggedItem = CopellaState.stations.splice(CopellaState.draggedItemIndex, 1)[0]; CopellaState.stations.splice(droppedOnIndex, 0, draggedItem); if (CopellaState.currentStationIndex === CopellaState.draggedItemIndex) CopellaState.currentStationIndex = droppedOnIndex; else if (CopellaState.draggedItemIndex < CopellaState.currentStationIndex && droppedOnIndex >= CopellaState.currentStationIndex) CopellaState.currentStationIndex--; else if (CopellaState.draggedItemIndex > CopellaState.currentStationIndex && droppedOnIndex <= CopellaState.currentStationIndex) CopellaState.currentStationIndex++; CopellaStorage.saveStations(); renderList(CopellaDOM.stationSearchInput.value); });
+    
+    // Mobile touch drag & drop
+    var touchStartY = 0;
+    var touchStartX = 0;
+    var isDragging = false;
+    var dragThreshold = 10;
+    
+    dragHandle.addEventListener('touchstart', function(e) {
+      touchStartY = e.touches[0].clientY;
+      touchStartX = e.touches[0].clientX;
+      isDragging = false;
+      CopellaState.draggedItemIndex = index;
+      item.classList.add('opacity-50');
+      e.preventDefault();
+    }, { passive: false });
+    
+    dragHandle.addEventListener('touchmove', function(e) {
+      if (!CopellaState.draggedItemIndex) return;
+      
+      var touchY = e.touches[0].clientY;
+      var touchX = e.touches[0].clientX;
+      var deltaY = Math.abs(touchY - touchStartY);
+      var deltaX = Math.abs(touchX - touchStartX);
+      
+      if (deltaY > dragThreshold || deltaX > dragThreshold) {
+        isDragging = true;
+        e.preventDefault();
+        
+        // Находим элемент под пальцем
+        var elementBelow = document.elementFromPoint(touchX, touchY);
+        var targetItem = elementBelow ? elementBelow.closest('.station-list-item') : null;
+        
+        if (targetItem && targetItem !== item) {
+          var targetIndex = parseInt(targetItem.dataset.index);
+          if (targetIndex !== index) {
+            // Перемещаем элементы
+            var draggedItem = CopellaState.stations.splice(index, 1)[0];
+            CopellaState.stations.splice(targetIndex, 0, draggedItem);
+            
+            // Обновляем индексы
+            if (CopellaState.currentStationIndex === index) {
+              CopellaState.currentStationIndex = targetIndex;
+            } else if (index < CopellaState.currentStationIndex && targetIndex >= CopellaState.currentStationIndex) {
+              CopellaState.currentStationIndex--;
+            } else if (index > CopellaState.currentStationIndex && targetIndex <= CopellaState.currentStationIndex) {
+              CopellaState.currentStationIndex++;
+            }
+            
+            CopellaStorage.saveStations();
+            renderList(CopellaDOM.stationSearchInput.value);
+            
+            // Обновляем индекс текущего элемента
+            index = targetIndex;
+            item.dataset.index = index;
+          }
+        }
+      }
+    }, { passive: false });
+    
+    dragHandle.addEventListener('touchend', function(e) {
+      if (isDragging) {
+        e.preventDefault();
+        CopellaUI.haptic();
+      }
+      item.classList.remove('opacity-50');
+      CopellaState.draggedItemIndex = null;
+      isDragging = false;
+    });
   }
   function deleteStation(indexToDelete) {
     if (CopellaState.currentStationIndex === indexToDelete) {
