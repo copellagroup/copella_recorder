@@ -81,7 +81,7 @@ window.CopellaStreamInfo = (function(){
     infoHTML += '<div class="bg-bg-color p-2 rounded-small"><div class="text-xs text-text-secondary">Время обновления</div><div class="text-xs text-text-primary">' + new Date(details.timestamp).toLocaleString() + '</div></div>';
     infoHTML += '</div>';
     
-    var content = '<div class="modal-content bg-panel-bg rounded-large p-5 max-w-lg w-full mx-4">'
+    var content = '<div class="modal-content bg-panel-bg rounded-large p-5 max-w-lg w-full mx-4 transform scale-95 transition-transform duration-300">'
       + '<div class="flex justify-between items-center mb-4">'
       + '<h3 class="text-lg font-bold text-text-primary">Информация о потоке</h3>'
       + '<button class="close-btn text-2xl text-text-secondary">&times;</button>'

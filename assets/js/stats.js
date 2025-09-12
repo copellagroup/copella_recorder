@@ -90,7 +90,7 @@ window.CopellaStats = (function(){
       topStationsHTML += '</div></div>';
     }
 
-    var content = '<div class="modal-content bg-panel-bg rounded-large p-5 max-w-lg w-full mx-4">'
+    var content = '<div class="modal-content bg-panel-bg rounded-large p-5 max-w-lg w-full mx-4 transform scale-95 transition-transform duration-300">'
       + '<div class="flex justify-between items-center mb-4">'
       + '<h3 class="text-lg font-bold text-text-primary">Статистика прослушивания</h3>'
       + '<button class="close-btn text-2xl text-text-secondary">&times;</button>'

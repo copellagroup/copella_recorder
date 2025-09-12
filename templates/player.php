@@ -1,7 +1,7 @@
 <?php if (!defined('ABSPATH')) { exit; } ?>
 <div class="app-container flex flex-col h-full max-w-4xl mx-auto w-full p-4 sm:p-6 pb-[calc(1rem+env(safe-area-inset-bottom))] bg-bg-color text-text-primary font-manrope min-h-screen antialiased">
     <!-- Компактный хедер для встраивания в существующий сайт -->
-    <header class="app-header fixed top-0 left-0 right-0 z-50 flex justify-between items-center h-20 px-4 bg-[#1a1a1a] border-b border-white/10 font-gilroy">
+    <header class="app-header fixed top-0 left-0 right-0 z-50 flex justify-between items-center h-16 sm:h-18 px-4 bg-[#1a1a1a] border-b border-white/10 font-gilroy">
         <!-- Кнопка "Назад" -->
         <div class="back-button-container">
             <button id="backBtn" class="back-btn flex items-center gap-2 text-text-secondary hover:text-accent transition-colors group" title="Вернуться назад">
@@ -14,7 +14,7 @@
         
         <!-- Центральная часть с логотипом -->
         <div class="header-center flex-1 text-center flex justify-center items-center">
-            <img src="https://copella.live/wp-content/uploads/2025/09/Новый-проект-504-FCF08D2.png" alt="Copella Logo" class="header-logo h-16 inline-block transition-all duration-300">
+            <img src="https://copella.live/wp-content/uploads/2025/09/Новый-проект-504-FCF08D2.png" alt="Copella Logo" class="header-logo h-14 sm:h-16 inline-block transition-all duration-300">
         </div>
         
         <!-- Действия справа -->
@@ -25,7 +25,7 @@
             </button>
         </div>
     </header>
-    <main class="flex flex-col flex-grow overflow-hidden pt-20">
+    <main class="flex flex-col flex-grow overflow-hidden pt-16 sm:pt-18">
         <section id="playerPanel" class="player-panel relative bg-panel-bg rounded-large p-6 mt-4 flex-shrink-0 overflow-hidden">
             <canvas id="visualizer" class="absolute inset-0 z-0 opacity-70 pointer-events-none"></canvas>
             <div class="absolute top-4 right-4 z-20 flex gap-2">

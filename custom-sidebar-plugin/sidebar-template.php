@@ -42,6 +42,12 @@
         </span>
         <span class="cp-sb__label">Задонатить</span>
       </a>
+      <a class="cp-sb__item cp-sb__recorder" href="https://copella.live/copella-recorder" title="Copella Recorder">
+        <span class="cp-sb__icon" aria-hidden="true">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g fill="currentColor"><path d="M12 14a4 4 0 1 0-4-4a4 4 0 0 0 4 4"/><path d="M16.5 10a1 1 0 0 0-1 1a3.5 3.5 0 1 1-7 0a1 1 0 1 0-2 0a5.5 5.5 0 0 0 5 5.477V19H8a1 1 0 0 0 0 2h8a1 1 0 1 0 0-2h-3.5v-2.523A5.5 5.5 0 0 0 17.5 11a1 1 0 0 0-1-1"/></g></svg>
+        </span>
+        <span class="cp-sb__label">Copella Recorder</span>
+      </a>
     </nav>
     
   </div>
@@ -97,6 +103,12 @@
           <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24"><path fill="currentColor" d="M12 21s-1-.684-2.293-1.824C7.4 17.6 4 14.6 4 10.8C4 8.149 6.149 6 8.8 6c1.362 0 2.65.624 3.2 1.6c.55-.976 1.838-1.6 3.2-1.6C17.851 6 20 8.149 20 10.8c0 3.8-3.4 6.8-5.707 8.376C13 20.316 12 21 12 21"/></svg>
         </span>
         <span class="cp-sb__label">Задонатить</span>
+      </a>
+      <a class="cp-sb__drawer-item cp-sb__recorder" href="https://copella.live/copella-recorder" title="Copella Recorder">
+        <span class="cp-sb__icon" aria-hidden="true">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g fill="currentColor"><path d="M12 14a4 4 0 1 0-4-4a4 4 0 0 0 4 4"/><path d="M16.5 10a1 1 0 0 0-1 1a3.5 3.5 0 1 1-7 0a1 1 0 1 0-2 0a5.5 5.5 0 0 0 5 5.477V19H8a1 1 0 0 0 0 2h8a1 1 0 1 0 0-2h-3.5v-2.523A5.5 5.5 0 0 0 17.5 11a1 1 0 0 0-1-1"/></g></svg>
+        </span>
+        <span class="cp-sb__label">Copella Recorder</span>
       </a>
     </nav>
   </div>
