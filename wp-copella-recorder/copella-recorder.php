@@ -9,12 +9,19 @@
 
 if (!defined('ABSPATH')) { exit; }
 
+// Предотвращаем повторную загрузку плагина
+if (defined('COPEL_REC_PLUGIN_FILE')) { return; }
+
 define('COPEL_REC_PLUGIN_FILE', __FILE__);
 define('COPEL_REC_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('COPEL_REC_PLUGIN_URL', plugin_dir_url(__FILE__));
 
 // Enqueue front-end assets
-add_action('wp_enqueue_scripts', function() {
+if (!has_action('wp_enqueue_scripts', 'copella_enqueue_scripts')) {
+    add_action('wp_enqueue_scripts', 'copella_enqueue_scripts');
+}
+
+function copella_enqueue_scripts() {
     // Tailwind via CDN (match original)
     wp_enqueue_script('tailwind-cdn', 'https://cdn.tailwindcss.com', [], null, true);
     wp_add_inline_script('tailwind-cdn', 'tailwind.config = { theme: { extend: { colors: { "bg-color": "#0A0A0A", "panel-bg": "#1C1C1C", "text-primary": "#FFFFFF", "text-secondary": "#8A8A8E", "accent": "#FFFFFF", "accent-green": "#30D158", "accent-blue": "#0A84FF", "border-color": "#333333", "record": "#FF453A", "error": "#FF453A", "warning": "#FFD53A" }, fontFamily: { manrope: ["Manrope", "sans-serif"] }, borderRadius: { large: "24px", medium: "16px", small: "12px" }, transitionProperty: { width: "width" }, keyframes: { spin: { to: { transform: "rotate(360deg)" } }, "pulse-record-glow": { "0%, 100%": { boxShadow: "0 0 0 0px rgba(255, 69, 58, 0.7)" }, "70%": { boxShadow: "0 0 0 10px rgba(255, 69, 58, 0)" } }, "pulse-border": { "0%, 100%": { boxShadow: "0 0 0 0 rgba(255, 69, 58, 0.7)" }, "70%": { boxShadow: "0 0 0 8px rgba(255, 69, 58, 0)" } }, bounce: { "0%, 40%, 100%": { height: "2px" }, "20%": { height: "10px" } }, fadeInUp: { from: { opacity: 0, transform: "translateY(20px) scale(0.95)" }, to: { opacity: 1, transform: "translateY(0) scale(1)" } }, fadeOutDown: { from: { opacity: 1, transform: "translateY(0) scale(1)" }, to: { opacity: 0, transform: "translateY(20px) scale(0.95)" } } }, animation: { spin: "spin 1s linear infinite", "pulse-record-glow": "pulse-record-glow 1.5s infinite", "pulse-border": "pulse-border 1.5s infinite", bounce: "bounce 1.2s ease-in-out infinite", "fade-in-up": "fadeInUp 0.3s ease-out forwards", "fade-out-down": "fadeOutDown 0.3s ease-in forwards" } } } };', 'after');
@@ -50,12 +57,14 @@ add_action('wp_enqueue_scripts', function() {
         'pluginUrl' => COPEL_REC_PLUGIN_URL,
         'ajaxUrl'   => admin_url('admin-ajax.php'),
     ]);
-});
+}
 
 // Shortcode to render the app container
-add_shortcode('copella_recorder', function() {
-    ob_start();
-    include COPEL_REC_PLUGIN_DIR . 'templates/player.php';
-    return ob_get_clean();
-});
+if (!shortcode_exists('copella_recorder')) {
+    add_shortcode('copella_recorder', function() {
+        ob_start();
+        include COPEL_REC_PLUGIN_DIR . 'templates/player.php';
+        return ob_get_clean();
+    });
+}
 
