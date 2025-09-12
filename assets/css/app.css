@@ -207,7 +207,7 @@ html, body { background-color: #0A0A0A; }
   text-decoration: none;
   color: var(--text-primary);
   background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.06);
+  border: none;
   border-radius: 12px;
   padding: 12px;
   height: 100%;
@@ -217,14 +217,12 @@ html, body { background-color: #0A0A0A; }
 
 .api-search-card:hover {
   background: rgba(255,255,255,0.08);
-  border-color: rgba(255,255,255,0.12);
   transform: translateY(-2px);
 }
 
 .api-search-card.dragging {
   transform: rotate(5deg) scale(1.05);
   z-index: 1000;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
 }
 
 .api-search-drag-handle {
