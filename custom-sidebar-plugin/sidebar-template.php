@@ -44,7 +44,7 @@
       </a>
       <a class="cp-sb__item cp-sb__recorder" href="https://copella.live/copella-recorder" title="Copella Recorder">
         <span class="cp-sb__icon" aria-hidden="true">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g fill="currentColor"><path d="M12 14a4 4 0 1 0-4-4a4 4 0 0 0 4 4"/><path d="M16.5 10a1 1 0 0 0-1 1a3.5 3.5 0 1 1-7 0a1 1 0 1 0-2 0a5.5 5.5 0 0 0 5 5.477V19H8a1 1 0 0 0 0 2h8a1 1 0 1 0 0-2h-3.5v-2.523A5.5 5.5 0 0 0 17.5 11a1 1 0 0 0-1-1"/></g></svg>
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g fill="currentColor"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6" fill="#1a1a1a"/><circle cx="12" cy="12" r="2"/></g></svg>
         </span>
         <span class="cp-sb__label">Copella Recorder</span>
       </a>
@@ -106,7 +106,7 @@
       </a>
       <a class="cp-sb__drawer-item cp-sb__recorder" href="https://copella.live/copella-recorder" title="Copella Recorder">
         <span class="cp-sb__icon" aria-hidden="true">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g fill="currentColor"><path d="M12 14a4 4 0 1 0-4-4a4 4 0 0 0 4 4"/><path d="M16.5 10a1 1 0 0 0-1 1a3.5 3.5 0 1 1-7 0a1 1 0 1 0-2 0a5.5 5.5 0 0 0 5 5.477V19H8a1 1 0 0 0 0 2h8a1 1 0 1 0 0-2h-3.5v-2.523A5.5 5.5 0 0 0 17.5 11a1 1 0 0 0-1-1"/></g></svg>
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g fill="currentColor"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6" fill="#1a1a1a"/><circle cx="12" cy="12" r="2"/></g></svg>
         </span>
         <span class="cp-sb__label">Copella Recorder</span>
       </a>

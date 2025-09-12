@@ -48,6 +48,7 @@
 
   var header = document.getElementById('cp-header');
   var toggle = document.querySelector('[data-search-toggle]') || document.querySelector('.cp-header__search-toggle');
+  var sidebarToggle = document.querySelector('[data-sidebar-toggle]') || document.querySelector('.cp-header__sidebar-toggle');
   var form = document.querySelector('.cp-header__search-form');
   var searchInput = form ? form.querySelector('input[type="search"]') : null;
   var searchCancel = document.querySelector('[data-search-cancel]');
@@ -92,6 +93,21 @@
       var expanded = toggle.getAttribute('aria-expanded') === 'true';
       setExpanded(!expanded);
       if (!expanded && searchInput) { try { searchInput.focus(); } catch(_){} }
+    }, false);
+  }
+
+  // Sidebar toggle functionality
+  if (sidebarToggle) {
+    sidebarToggle.addEventListener('click', function(){
+      var expanded = sidebarToggle.getAttribute('aria-expanded') === 'true';
+      sidebarToggle.setAttribute('aria-expanded', !expanded);
+      
+      // Toggle sidebar expansion state
+      if (expanded) {
+        root.classList.remove('cp-sb-expanded');
+      } else {
+        root.classList.add('cp-sb-expanded');
+      }
     }, false);
   }
 

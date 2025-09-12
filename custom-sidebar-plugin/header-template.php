@@ -5,6 +5,10 @@
       <svg class="cp-header__icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg>
     </button>
 
+    <button class="cp-header__sidebar-toggle cp-header__icon-btn" type="button" aria-label="Открыть боковое меню" aria-expanded="false" data-sidebar-toggle>
+      <svg class="cp-header__icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg>
+    </button>
+
     <a class="cp-header__logo cp-header__logo--mobile" href="<?php echo esc_url( home_url( '/' ) ); ?>" aria-label="Copella home">
       <img src="https://copella.live/wp-content/uploads/2024/10/clive.png" alt="Copella" />
     </a>
