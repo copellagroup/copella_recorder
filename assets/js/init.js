@@ -41,13 +41,11 @@ document.addEventListener('DOMContentLoaded', function(){
     var list = document.createElement('ul');
     list.className = 'api-search-list';
     
-    stations.forEach(function(station, index){
+    stations.forEach(function(station){
       var url = station.url_resolved || station.url;
       var isAlreadyAdded = CopellaState.stations.some(function(s){ return s.url === url; });
       var item = document.createElement('li');
       item.className = 'api-search-item';
-      item.draggable = true;
-      item.dataset.stationIndex = index;
       
       var iconHTML = station.favicon ? 
         '<img src="' + station.favicon + '" class="api-search-thumb" onerror="this.style.display=\'none\'">' : 
@@ -56,9 +54,6 @@ document.addEventListener('DOMContentLoaded', function(){
       
       item.innerHTML = 
         '<div class="api-search-card">' +
-          '<div class="api-search-drag-handle">' +
-            '<svg fill="currentColor" viewBox="0 0 24 24"><path d="M11 18c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm-2-8c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0-6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm6 4c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>' +
-          '</div>' +
           iconHTML +
           '<div class="api-search-meta">' +
             '<p class="api-search-name" title="' + station.name + '">' + station.name + '</p>' +
@@ -78,38 +73,6 @@ document.addEventListener('DOMContentLoaded', function(){
           addStationFromApi(station, e.currentTarget); 
         };
       }
-      
-      // Добавляем обработчики перетаскивания
-      item.addEventListener('dragstart', function(e) {
-        e.dataTransfer.setData('text/plain', index);
-        e.dataTransfer.effectAllowed = 'move';
-        item.querySelector('.api-search-card').classList.add('dragging');
-      });
-      
-      item.addEventListener('dragend', function(e) {
-        item.querySelector('.api-search-card').classList.remove('dragging');
-      });
-      
-      item.addEventListener('dragover', function(e) {
-        e.preventDefault();
-        e.dataTransfer.dropEffect = 'move';
-      });
-      
-      item.addEventListener('drop', function(e) {
-        e.preventDefault();
-        var draggedIndex = parseInt(e.dataTransfer.getData('text/plain'));
-        var targetIndex = parseInt(item.dataset.stationIndex);
-        
-        if (draggedIndex !== targetIndex) {
-          // Перемещаем элементы в массиве
-          var draggedStation = stations[draggedIndex];
-          stations.splice(draggedIndex, 1);
-          stations.splice(targetIndex, 0, draggedStation);
-          
-          // Перерендериваем список
-          renderApiResults(stations);
-        }
-      });
       
       list.appendChild(item);
     });
