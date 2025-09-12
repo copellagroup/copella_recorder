@@ -73,6 +73,9 @@
   .cp-header__row { grid-template-columns: 44px 1fr 44px; gap: 4px; }
   .cp-header__logo--mobile { display: flex; }
   
+  /* Увеличиваем логотип на мобильных */
+  .cp-header__logo--mobile img { height: 80px; width: auto; }
+  
   /* Mobile search form - hidden by default */
   .cp-header__search-form { 
     display: none; 

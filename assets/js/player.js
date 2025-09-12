@@ -64,13 +64,13 @@ window.CopellaPlayer = (function(){
     CopellaDOM.playerPanel.classList.add('loading');
     var streamUrl = station.url;
     
-    // Улучшенная логика поддержки различных типов потоков
+    // Упрощенная логика поддержки потоков
     if (isHlsStream(streamUrl)) {
       playHlsStream(streamUrl);
     } else if (isIcecastStream(streamUrl)) {
       playIcecastStream(streamUrl);
     } else {
-      // Для потоков без явного расширения сначала пробуем HLS
+      // Для всех остальных потоков пробуем HLS
       tryHlsFirst(streamUrl);
     }
     CopellaStorage.setLastPlayed(index);
@@ -94,7 +94,7 @@ window.CopellaPlayer = (function(){
   }
 
   function tryHlsFirst(streamUrl) {
-    // Сначала пробуем как HLS поток
+    // Пробуем как HLS поток без fallback
     try { 
       CopellaState.hls.destroy(); 
     } catch(e) {}
@@ -107,9 +107,9 @@ window.CopellaPlayer = (function(){
       maxMaxBufferLength: 60,
       liveSyncDurationCount: 3,
       liveMaxLatencyDurationCount: 5,
-      fragLoadingTimeOut: 15000,
-      manifestLoadingTimeOut: 8000,
-      levelLoadingTimeOut: 8000,
+      fragLoadingTimeOut: 20000,
+      manifestLoadingTimeOut: 15000,
+      levelLoadingTimeOut: 15000,
       startLevel: -1,
       capLevelToPlayerSize: false,
       maxLoadingDelay: 4,
@@ -120,39 +120,22 @@ window.CopellaPlayer = (function(){
     CopellaState.hls.loadSource(streamUrl);
     CopellaState.hls.attachMedia(CopellaDOM.audioPlayer);
     
-    var hlsFailed = false;
-    
     CopellaState.hls.on(Hls.Events.MANIFEST_PARSED, function(){ 
       console.log('HLS manifest parsed successfully (tryHlsFirst)');
       CopellaDOM.audioPlayer.play().catch(function(err) {
         console.error('HLS play failed in tryHlsFirst:', err);
-        if (!hlsFailed) {
-          hlsFailed = true;
-          CopellaUI.showToast('HLS не работает, пробуем нативное воспроизведение', 'info');
-          playNatively(streamUrl);
-        }
+        CopellaUI.showToast('Ошибка воспроизведения потока', 'error');
+        CopellaDOM.playerPanel.classList.add('error');
       }); 
     });
     
     CopellaState.hls.on(Hls.Events.ERROR, function(event, data){ 
       console.error('HLS error in tryHlsFirst:', data);
-      if (data.fatal && !hlsFailed) {
-        hlsFailed = true;
-        console.log('HLS failed, switching to native playback');
-        CopellaUI.showToast('HLS не поддерживается, переключаемся на нативное воспроизведение', 'info');
-        playNatively(streamUrl);
+      if (data.fatal) {
+        CopellaUI.showToast('Ошибка воспроизведения потока', 'error');
+        CopellaDOM.playerPanel.classList.add('error');
       }
     });
-    
-    // Таймаут для HLS - если за 10 секунд не загрузился, переходим на нативное
-    setTimeout(function() {
-      if (!hlsFailed && CopellaState.hls && CopellaState.hls.media && CopellaState.hls.media.readyState < 2) {
-        hlsFailed = true;
-        console.log('HLS timeout, switching to native playback');
-        CopellaUI.showToast('HLS загрузка слишком медленная, переключаемся на нативное воспроизведение', 'info');
-        playNatively(streamUrl);
-      }
-    }, 10000);
   }
 
   function playHlsStream(streamUrl) {
@@ -189,8 +172,8 @@ window.CopellaPlayer = (function(){
       console.log('HLS manifest parsed successfully');
       CopellaDOM.audioPlayer.play().catch(function(err) {
         console.error('HLS play failed:', err);
-        CopellaUI.showToast('Ошибка воспроизведения HLS потока, пробуем нативное воспроизведение', 'warning');
-        playNatively(streamUrl);
+        CopellaUI.showToast('Ошибка воспроизведения HLS потока', 'error');
+        CopellaDOM.playerPanel.classList.add('error');
       }); 
     });
     
@@ -208,8 +191,8 @@ window.CopellaPlayer = (function(){
             break;
           default:
             console.log('Fatal error, cannot recover');
-            CopellaUI.showToast('Критическая ошибка HLS потока, пробуем нативное воспроизведение', 'warning');
-            playNatively(streamUrl);
+            CopellaUI.showToast('Критическая ошибка HLS потока', 'error');
+            CopellaDOM.playerPanel.classList.add('error');
             break;
         }
       }
