@@ -1,0 +1,123 @@
+<?php
+/**
+ * Plugin Name: Copella UI (NextGen)
+ * Description: Sidebar + Header with search. High-quality, low-jank. Mini rail on desktop with hover expand. Burger drawer on mobile. Accessible and performant.
+ * Version: 2.1.0
+ * Author: Copella
+ */
+
+if (!defined('ABSPATH')) { exit; }
+
+// Функция для определения страницы copella-recorder
+function isCopellaRecorderPage() {
+    // Проверяем URL
+    $current_url = $_SERVER['REQUEST_URI'] ?? '';
+    if (strpos($current_url, '/copella-recorder') !== false) {
+        return true;
+    }
+    
+    // Проверяем slug страницы
+    if (is_page() && get_post_field('post_name') === 'copella-recorder') {
+        return true;
+    }
+    
+    // Проверяем наличие шорткода [copella_recorder] в контенте
+    global $post;
+    if ($post && has_shortcode($post->post_content, 'copella_recorder')) {
+        return true;
+    }
+    
+    // Проверяем по классу body (если он установлен)
+    if (is_admin()) {
+        return false;
+    }
+    
+    // Дополнительная проверка через JavaScript будет выполнена на клиенте
+    return false;
+}
+
+add_action('wp_enqueue_scripts', function () {
+    // Skip loading for admin, REST API, AJAX, and cron requests
+    if (is_admin() || wp_doing_ajax() || wp_doing_cron() || 
+        (defined('REST_REQUEST') && REST_REQUEST)) {
+        return;
+    }
+    
+    // This is a UI plugin, only skip on specific contexts where sidebar isn't needed
+    // For now, load on all frontend pages as it's core UI functionality
+    
+    $base = plugin_dir_path(__FILE__);
+    $url  = plugin_dir_url(__FILE__);
+
+    // Проверяем, находимся ли мы на странице copella-recorder
+    $is_recorder_page = isCopellaRecorderPage();
+
+    // Sidebar CSS
+    $css_sidebar = $url . 'nextgen/sidebar.css';
+    wp_enqueue_style('cp-sidebar-nextgen', $css_sidebar, array(), file_exists($base.'nextgen/sidebar.css') ? filemtime($base.'nextgen/sidebar.css') : null);
+
+    // Header CSS - выбираем нужный в зависимости от страницы
+    if ($is_recorder_page) {
+        // Специальный хедер для copella-recorder
+        $css_header = $url . 'nextgen/header-recorder.css';
+        if (file_exists($base.'nextgen/header-recorder.css')) {
+            wp_enqueue_style('cp-header-recorder', $css_header, array('cp-sidebar-nextgen'), filemtime($base.'nextgen/header-recorder.css'));
+        }
+    } else {
+        // Обычный хедер
+        $css_header = $url . 'nextgen/header.css';
+        if (file_exists($base.'nextgen/header.css')) {
+            wp_enqueue_style('cp-header-nextgen', $css_header, array('cp-sidebar-nextgen'), filemtime($base.'nextgen/header.css'));
+        }
+    }
+
+    // GSAP (for smoother, widely-compatible animations incl. older mobile browsers)
+    $gsap_cdn = 'https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js';
+    wp_register_script('gsap', $gsap_cdn, array(), '3.12.5', array('in_footer' => true));
+    if (function_exists('wp_script_add_data')) { wp_script_add_data('gsap', 'strategy', 'defer'); }
+    wp_enqueue_script('gsap');
+
+    // Sidebar JS
+    $js_sidebar = $url . 'nextgen/sidebar.js';
+    wp_register_script('cp-sidebar-nextgen', $js_sidebar, array('gsap'), file_exists($base.'nextgen/sidebar.js') ? filemtime($base.'nextgen/sidebar.js') : null, array('in_footer' => true));
+    if (function_exists('wp_script_add_data')) { wp_script_add_data('cp-sidebar-nextgen', 'strategy', 'defer'); }
+    wp_enqueue_script('cp-sidebar-nextgen');
+
+    // Header JS - выбираем нужный в зависимости от страницы
+    if ($is_recorder_page) {
+        // Специальный JavaScript для copella-recorder
+        $js_header = $url . 'nextgen/header-recorder.js';
+        if (file_exists($base.'nextgen/header-recorder.js')) {
+            wp_register_script('cp-header-recorder', $js_header, array(), filemtime($base.'nextgen/header-recorder.js'), array('in_footer' => true));
+            if (function_exists('wp_script_add_data')) { wp_script_add_data('cp-header-recorder', 'strategy', 'defer'); }
+            wp_enqueue_script('cp-header-recorder');
+        }
+    } else {
+        // Обычный JavaScript для хедера
+        $js_header = $url . 'nextgen/header.js';
+        if (file_exists($base.'nextgen/header.js')) {
+            wp_register_script('cp-header-nextgen', $js_header, array(), filemtime($base.'nextgen/header.js'), array('in_footer' => true));
+            if (function_exists('wp_script_add_data')) { wp_script_add_data('cp-header-nextgen', 'strategy', 'defer'); }
+            wp_enqueue_script('cp-header-nextgen');
+        }
+    }
+}, 5);
+
+add_action('wp_body_open', function() {
+    static $rendered = false; if ($rendered) return; $rendered = true;
+    
+    // Проверяем, находимся ли мы на странице copella-recorder
+    $is_recorder_page = isCopellaRecorderPage();
+    
+    if ($is_recorder_page) {
+        // Показываем специальный хедер для copella-recorder
+        include __DIR__ . '/nextgen/header-template-recorder.php';
+    } else {
+        // Показываем обычный хедер
+        include __DIR__ . '/nextgen/header-template.php';
+    }
+    
+    // Sidebar показываем всегда
+    include __DIR__ . '/nextgen/sidebar-template.php';
+});
+

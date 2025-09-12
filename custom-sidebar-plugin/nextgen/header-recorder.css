@@ -1,0 +1,102 @@
+/* Специальный хедер для Copella Recorder */
+.cp-header-recorder {
+  background: #0A0A0A;
+  color: #FFFFFF;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.cp-header-recorder .cp-header__row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 16px;
+  height: 100%;
+}
+
+.cp-header-recorder .back-button-container {
+  flex-shrink: 0;
+}
+
+.cp-header-recorder .back-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: transparent;
+  border: none;
+  color: #8A8A8E;
+  font-family: 'Manrope', sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.cp-header-recorder .back-btn:hover {
+  color: #FFFFFF;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.cp-header-recorder .back-btn svg {
+  width: 20px;
+  height: 20px;
+}
+
+.cp-header-recorder .header-center {
+  flex: 1;
+  text-align: center;
+}
+
+.cp-header-recorder .header-logo {
+  height: 48px;
+  width: auto;
+  transition: all 0.3s ease;
+}
+
+@media (min-width: 640px) {
+  .cp-header-recorder .header-logo {
+    height: 56px;
+  }
+}
+
+.cp-header-recorder .header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.cp-header-recorder .action-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: transparent;
+  border: none;
+  color: #8A8A8E;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.cp-header-recorder .action-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #FFFFFF;
+}
+
+.cp-header-recorder .action-btn svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* Скрыть обычный хедер на странице recorder */
+body.copella-recorder-page #cp-header {
+  display: none !important;
+}
+
+/* Показать специальный хедер только на странице recorder */
+body:not(.copella-recorder-page) #cp-header-recorder {
+  display: none !important;
+}
