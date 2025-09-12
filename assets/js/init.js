@@ -32,22 +32,77 @@ document.addEventListener('DOMContentLoaded', function(){
   }
   function renderApiResults(stations) {
     CopellaDOM.apiSearchResultsContainer.innerHTML = '';
-    if (!stations || stations.length === 0) { CopellaDOM.apiSearchMessage.textContent = 'Ничего не найдено.'; return; }
+    if (!stations || stations.length === 0) { 
+      CopellaDOM.apiSearchMessage.textContent = 'Ничего не найдено.'; 
+      return; 
+    }
     CopellaDOM.apiSearchMessage.textContent = '';
+    
+    var list = document.createElement('ul');
+    list.className = 'api-search-list';
+    
     stations.forEach(function(station){
       var url = station.url_resolved || station.url;
       var isAlreadyAdded = CopellaState.stations.some(function(s){ return s.url === url; });
-      var item = document.createElement('div');
-      item.className = 'flex items-center gap-3 p-2 rounded-medium mb-3 bg-panel-bg';
-      var iconHTML = station.favicon ? '<img src="' + station.favicon + '" class="w-full h-full object-cover" onerror="this.style.display=\'none\'">' : CopellaUI.createPlaceholder(station.name, ['text-xl']);
-      item.innerHTML = '<div class="relative w-14 h-14 flex-shrink-0 rounded-small overflow-hidden bg-bg-color">' + iconHTML + '</div>' +
-        '<div class="flex-grow overflow-hidden"><p class="font-bold text-base truncate" title="' + station.name + '">' + station.name + '</p><p class="text-sm text-text-secondary truncate">' + (station.country || '') + '</p></div>' +
-        '<div class="flex-shrink-0 flex gap-0"><button class="add-api-btn p-2 rounded-full text-text-secondary hover:bg-white/10 ' + (isAlreadyAdded ? 'text-accent-green' : 'hover:text-accent-green') + ' transition-colors" title="Добавить в мой список" ' + (isAlreadyAdded ? 'disabled' : '') + '>' + (isAlreadyAdded ? CopellaConfig.ICONS.check : CopellaConfig.ICONS.add) + '</button></div>';
+      var item = document.createElement('li');
+      item.className = 'api-search-item';
+      
+      var iconHTML = station.favicon ? 
+        '<img src="' + station.favicon + '" class="api-search-thumb" onerror="this.style.display=\'none\'">' : 
+        '<div class="api-search-thumb bg-bg-color flex items-center justify-center text-text-secondary font-bold text-lg">' + 
+        (station.name.charAt(0).toUpperCase()) + '</div>';
+      
+      item.innerHTML = 
+        '<div class="api-search-card">' +
+          iconHTML +
+          '<div class="api-search-meta">' +
+            '<p class="api-search-name" title="' + station.name + '">' + station.name + '</p>' +
+            '<p class="api-search-country">' + (station.country || 'Неизвестная страна') + '</p>' +
+          '</div>' +
+          '<div class="api-search-actions">' +
+            '<button class="api-search-btn add-api-btn" title="Добавить в мой список" ' + 
+            (isAlreadyAdded ? 'disabled' : '') + '>' + 
+            (isAlreadyAdded ? CopellaConfig.ICONS.check : CopellaConfig.ICONS.add) + 
+            '</button>' +
+          '</div>' +
+        '</div>';
+      
       if (!isAlreadyAdded) {
-        item.querySelector('.add-api-btn').onclick = function(e){ e.stopPropagation(); addStationFromApi(station, e.currentTarget); };
+        item.querySelector('.add-api-btn').onclick = function(e){ 
+          e.stopPropagation(); 
+          addStationFromApi(station, e.currentTarget); 
+        };
       }
-      CopellaDOM.apiSearchResultsContainer.appendChild(item);
+      
+      list.appendChild(item);
     });
+    
+    CopellaDOM.apiSearchResultsContainer.appendChild(list);
+    
+    // Добавляем обработчики для кнопок навигации
+    var prevBtn = document.getElementById('apiSearchPrev');
+    var nextBtn = document.getElementById('apiSearchNext');
+    
+    if (prevBtn && nextBtn) {
+      prevBtn.onclick = function(e){ 
+        e.preventDefault(); 
+        scrollApiResults(-200); 
+      };
+      nextBtn.onclick = function(e){ 
+        e.preventDefault(); 
+        scrollApiResults(200); 
+      };
+    }
+  }
+  
+  function scrollApiResults(amount) {
+    var container = CopellaDOM.apiSearchResultsContainer;
+    if (!container) return;
+    try { 
+      container.scrollBy({ left: amount, behavior: 'smooth' }); 
+    } catch(_){ 
+      container.scrollLeft += amount; 
+    }
   }
   function addStationFromApi(apiStation, btn) {
     var url = apiStation.url_resolved || apiStation.url;
