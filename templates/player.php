@@ -53,7 +53,7 @@
             <div class="flex-grow overflow-y-auto pr-1">
                 <div id="stationListContainer"></div>
                 <div id="stationListMessage" class="text-center text-text-secondary p-12 hidden"></div>
-                <div id="apiSearchResults" class="mt-2 hidden">
+                <div id="apiSearchResults" class="hidden">
                     <div class="flex items-center justify-between mb-3 px-2">
                         <h3 class="text-sm font-bold text-text-secondary uppercase tracking-wider">Глобальный поиск</h3>
                         <div class="flex items-center gap-2">
