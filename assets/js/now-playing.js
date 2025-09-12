@@ -6,9 +6,12 @@ window.CopellaNowPlaying = (function(){
     // Добавляем элемент для отображения текущей программы
     addNowPlayingElement();
     
-    // Отслеживаем изменения аудио
+    // Отслеживаем изменения аудио только когда станция выбрана
     CopellaDOM.audioPlayer.addEventListener('loadstart', function() {
-      startTracking();
+      // Запускаем отслеживание только если станция выбрана
+      if (CopellaState.currentStationIndex !== -1) {
+        startTracking();
+      }
     });
     
     CopellaDOM.audioPlayer.addEventListener('pause', function() {
@@ -50,7 +53,7 @@ window.CopellaNowPlaying = (function(){
   
   function updateNowPlaying() {
     var audio = CopellaDOM.audioPlayer;
-    if (!audio || audio.paused) return;
+    if (!audio || audio.paused || CopellaState.currentStationIndex === -1) return;
     
     // Пытаемся получить метаданные из аудио потока
     try {

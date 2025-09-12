@@ -12,9 +12,14 @@ window.CopellaRecording = (function(){
   }
   function resetRecordingUI() {
     var btn = document.getElementById('recordButton');
+    var container = document.getElementById('player-now-playing');
     var playerArt = CopellaDOM.playerPanel.querySelector('.player-art');
     if (btn) btn.classList.remove('recording', 'animate-pulse-border', 'border-record');
     if (playerArt) playerArt.classList.remove('animate-pulse-record-glow');
+    if (container) {
+      container.classList.remove('recording-status', 'text-record', 'font-bold');
+      container.textContent = 'Прямой эфир';
+    }
     if (CopellaState.recordingInterval) { clearInterval(CopellaState.recordingInterval); CopellaState.recordingInterval = null; }
   }
   function showConversionProgress(show) {
