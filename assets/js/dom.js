@@ -19,6 +19,7 @@ window.CopellaDOM = {
   streamInfoBtn: document.getElementById('streamInfoBtn'),
   emptyAddBtn: document.getElementById('emptyAddBtn'),
   stationSearchInput: document.getElementById('stationSearchInput'),
+  clearSearchBtn: document.getElementById('clearSearchBtn'),
   stationListMessage: document.getElementById('stationListMessage'),
   schedulerBtn: document.getElementById('schedulerBtn'),
   recordingsBtn: document.getElementById('recordingsBtn'),

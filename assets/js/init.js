@@ -4,6 +4,14 @@ document.addEventListener('DOMContentLoaded', function(){
 
   function handleSearch(query) {
     CopellaStations.renderList(query);
+    
+    // Показываем/скрываем кнопку очистки
+    if (query.trim()) {
+      CopellaDOM.clearSearchBtn.classList.remove('hidden');
+    } else {
+      CopellaDOM.clearSearchBtn.classList.add('hidden');
+    }
+    
     if (query.length > 2) {
       CopellaDOM.apiSearchResults.style.display = 'block';
       CopellaDOM.apiSearchMessage.textContent = 'Идет поиск...';
@@ -67,6 +75,11 @@ document.addEventListener('DOMContentLoaded', function(){
       CopellaDOM.addStationHeaderBtn.onclick = function(){ CopellaUI.haptic(); CopellaModals.openStationModal(); };
       CopellaDOM.emptyAddBtn.onclick = function(){ CopellaUI.haptic(); CopellaModals.openStationModal(); };
       CopellaDOM.stationSearchInput.oninput = function(e){ handleSearch(e.target.value); };
+      CopellaDOM.clearSearchBtn.onclick = function(){ 
+        CopellaDOM.stationSearchInput.value = '';
+        CopellaDOM.clearSearchBtn.classList.add('hidden');
+        handleSearch(''); 
+      };
       CopellaDOM.schedulerBtn.onclick = function(){ CopellaUI.haptic(); CopellaScheduler.openSchedulerModal(); };
       CopellaDOM.recordingsBtn.onclick = function(){ CopellaUI.haptic(); CopellaRecording.openRecordingsModal(); };
       CopellaDOM.settingsBtn.onclick = function(){ CopellaUI.haptic(); CopellaModals.openSettingsModal(); };
