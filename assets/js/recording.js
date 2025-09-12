@@ -34,11 +34,6 @@ window.CopellaRecording = (function(){
   function toggleRecording() {
     if (CopellaState.currentStationIndex === -1 || CopellaDOM.audioPlayer.paused) { CopellaUI.showToast('Начните воспроизведение для записи.', 'warning'); return; }
     if (CopellaState.mediaRecorder && CopellaState.mediaRecorder.state === 'recording') {
-      // Очищаем таймер ограничения времени
-      if (CopellaState.recordingTimeout) {
-        clearTimeout(CopellaState.recordingTimeout);
-        CopellaState.recordingTimeout = null;
-      }
       CopellaState.mediaRecorder.stop();
     } else { startRecording(); }
   }
@@ -64,10 +59,6 @@ window.CopellaRecording = (function(){
   }
   function startRecording() {
     try {
-      // Ограничение времени записи для бесплатной версии - максимум 5 минут
-      CopellaState.recordingStartTime = Date.now();
-      CopellaState.maxRecordingTime = 5 * 60 * 1000; // 5 минут в миллисекундах
-      
       var stream = getCaptureStream();
       if (!stream || !stream.getAudioTracks || stream.getAudioTracks().length === 0) { CopellaUI.showToast('Не удалось захватить аудиопоток. Станция может быть защищена (CORS).', 'error'); return; }
       var mimeType = CopellaPlayer.chooseBestMimeType();
@@ -78,15 +69,6 @@ window.CopellaRecording = (function(){
       CopellaState.mediaRecorder.onstop = function(){ processRecording(); };
       CopellaState.mediaRecorder.start(1000);
       setRecordingUI();
-      
-      // Автоматическая остановка записи через 5 минут
-      CopellaState.recordingTimeout = setTimeout(function() {
-        if (CopellaState.isRecording) {
-          stopRecording();
-          CopellaUI.showToast('Запись автоматически остановлена. Бесплатная версия ограничена 5 минутами. Перейдите на copella.live!', 'warning', 5000);
-        }
-      }, CopellaState.maxRecordingTime);
-      
     } catch (e) { CopellaUI.showToast('Не удалось начать запись: ' + e.message, 'error'); }
   }
   function processRecording() {

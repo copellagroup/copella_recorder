@@ -14,6 +14,8 @@ window.CopellaDOM = {
   emptyStationsView: document.getElementById('empty-stations-view'),
   stationsHeader: document.getElementById('stationsHeader'),
   addStationHeaderBtn: document.getElementById('addStationHeaderBtn'),
+  exportBtn: document.getElementById('exportBtn'),
+  statsBtn: document.getElementById('statsBtn'),
   emptyAddBtn: document.getElementById('emptyAddBtn'),
   stationSearchInput: document.getElementById('stationSearchInput'),
   stationListMessage: document.getElementById('stationListMessage'),

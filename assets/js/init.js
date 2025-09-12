@@ -42,12 +42,6 @@ document.addEventListener('DOMContentLoaded', function(){
     });
   }
   function addStationFromApi(apiStation, btn) {
-    // Ограничение для бесплатной версии - максимум 5 станций
-    if (CopellaState.stations.length >= 5) {
-      CopellaUI.showToast('Бесплатная версия ограничена 5 станциями. Перейдите на copella.live для полной версии!', 'warning', 5000);
-      return;
-    }
-    
     var url = apiStation.url_resolved || apiStation.url;
     var newStation = { name: apiStation.name.trim(), url: url, icon: apiStation.favicon || '' };
     CopellaState.stations.push(newStation);
@@ -76,6 +70,12 @@ document.addEventListener('DOMContentLoaded', function(){
       CopellaDOM.schedulerBtn.onclick = function(){ CopellaUI.haptic(); CopellaScheduler.openSchedulerModal(); };
       CopellaDOM.recordingsBtn.onclick = function(){ CopellaUI.haptic(); CopellaRecording.openRecordingsModal(); };
       CopellaDOM.settingsBtn.onclick = function(){ CopellaUI.haptic(); CopellaModals.openSettingsModal(); };
+      CopellaDOM.exportBtn.onclick = function(){ CopellaUI.haptic(); CopellaExport.openExportModal(); };
+      CopellaDOM.statsBtn.onclick = function(){ CopellaUI.haptic(); CopellaStats.openStatsModal(); };
+      
+      // Инициализируем новые модули
+      CopellaStats.init();
+      CopellaGenres.addGenreFilter();
       
       // Обработчик кнопки "Назад"
       var backBtn = document.getElementById('backBtn');

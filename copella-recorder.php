@@ -50,7 +50,10 @@ function copella_enqueue_scripts() {
     wp_enqueue_script('copella-scheduler', COPEL_REC_PLUGIN_URL . 'assets/js/scheduler.js', ['copella-modals'], filemtime(COPEL_REC_PLUGIN_DIR . 'assets/js/scheduler.js'), true);
     wp_enqueue_script('copella-recording', COPEL_REC_PLUGIN_URL . 'assets/js/recording.js', ['copella-player', 'lamejs'], filemtime(COPEL_REC_PLUGIN_DIR . 'assets/js/recording.js'), true);
     wp_enqueue_script('copella-visualizer', COPEL_REC_PLUGIN_URL . 'assets/js/visualizer.js', ['copella-player'], filemtime(COPEL_REC_PLUGIN_DIR . 'assets/js/visualizer.js'), true);
-    wp_enqueue_script('copella-init', COPEL_REC_PLUGIN_URL . 'assets/js/init.js', ['copella-scheduler', 'copella-recording', 'copella-visualizer'], filemtime(COPEL_REC_PLUGIN_DIR . 'assets/js/init.js'), true);
+    wp_enqueue_script('copella-export', COPEL_REC_PLUGIN_URL . 'assets/js/export.js', ['copella-stations'], filemtime(COPEL_REC_PLUGIN_DIR . 'assets/js/export.js'), true);
+    wp_enqueue_script('copella-stats', COPEL_REC_PLUGIN_URL . 'assets/js/stats.js', ['copella-state'], filemtime(COPEL_REC_PLUGIN_DIR . 'assets/js/stats.js'), true);
+    wp_enqueue_script('copella-genres', COPEL_REC_PLUGIN_URL . 'assets/js/genres.js', ['copella-stations'], filemtime(COPEL_REC_PLUGIN_DIR . 'assets/js/genres.js'), true);
+    wp_enqueue_script('copella-init', COPEL_REC_PLUGIN_URL . 'assets/js/init.js', ['copella-scheduler', 'copella-recording', 'copella-visualizer', 'copella-export', 'copella-stats', 'copella-genres'], filemtime(COPEL_REC_PLUGIN_DIR . 'assets/js/init.js'), true);
 
     // Pass runtime data
     wp_localize_script('copella-config', 'CopellaRuntime', [

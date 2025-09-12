@@ -40,6 +40,8 @@
                 <div class="station-actions flex gap-1 sm:gap-2">
                     <button id="recordingsBtn" class="action-btn relative p-2 rounded-full text-text-secondary hover:bg-white/10 hover:text-accent transition-colors" title="Мои Записи"><svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M20 6h-8l-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V6h5.17l2 2H20v10z"></path></svg><span id="newRecordingBadge" class="absolute top-1 right-1 w-2.5 h-2.5 bg-record rounded-full border-2 border-panel-bg hidden"></span></button>
                     <button id="schedulerBtn" class="action-btn p-2 rounded-full text-text-secondary hover:bg-white/10 hover:text-accent transition-colors" title="Планировщик записей"><svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zM9 14H7v-2h2v2zm4 0h-2v-2h2v2zm4 0h-2v-2h2v2zM5 8V6h14v2H5z"></path></svg></button>
+                    <button id="exportBtn" class="action-btn p-2 rounded-full text-text-secondary hover:bg-white/10 hover:text-accent transition-colors" title="Экспорт плейлиста"><svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"></path></svg></button>
+                    <button id="statsBtn" class="action-btn p-2 rounded-full text-text-secondary hover:bg-white/10 hover:text-accent transition-colors" title="Статистика"><svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M16,6L18.29,8.29L13.41,13.17L9.41,9.17L2,16.59L3.41,18L9.41,12L13.41,16L19.71,9.71L22,12V6H16Z"></path></svg></button>
                     <button id="addStationHeaderBtn" class="action-btn p-2 rounded-full text-text-secondary hover:bg-white/10 hover:text-accent transition-colors" title="Добавить станцию"><svg class="w-6 h-6" viewBox="0 0 24 24" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"></path></svg></button>
                 </div>
             </div>
@@ -60,15 +62,8 @@
     <div id="schedulerModal" class="modal fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex justify-center items-center p-4 opacity-0 pointer-events-none transition-opacity duration-300"></div>
     <div id="recordingsModal" class="modal fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex justify-center items-center p-4 opacity-0 pointer-events-none transition-opacity duration-300"></div>
     <div id="settingsModal" class="modal fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex justify-center items-center p-4 opacity-0 pointer-events-none transition-opacity duration-300"></div>
+    <div id="exportModal" class="modal fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex justify-center items-center p-4 opacity-0 pointer-events-none transition-opacity duration-300"></div>
+    <div id="statsModal" class="modal fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex justify-center items-center p-4 opacity-0 pointer-events-none transition-opacity duration-300"></div>
     <div id="toastContainer" class="fixed bottom-0 right-0 left-0 sm:left-auto sm:bottom-4 sm:right-4 z-[100] p-4 flex flex-col items-center sm:items-end gap-3 pointer-events-none"></div>
-    
-    <!-- Водяной знак для бесплатной версии -->
-    <div class="fixed bottom-4 left-4 z-40 pointer-events-none">
-        <div class="bg-black/50 backdrop-blur-sm rounded-lg px-3 py-2 text-white/70 text-sm font-gilroy">
-            <span>Powered by </span>
-            <a href="https://copella.live" target="_blank" class="text-white hover:text-accent transition-colors pointer-events-auto">copella.live</a>
-        </div>
-    </div>
-    
     <audio id="audioPlayer" crossorigin="anonymous" class="hidden"></audio>
 </div>
