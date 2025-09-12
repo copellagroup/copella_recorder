@@ -87,5 +87,9 @@ window.CopellaModals = (function(){
     };
     reader.readAsText(file);
   }
-  return { openStationModal: openStationModal, openWelcomeModal: openWelcomeModal, openSettingsModal: openSettingsModal };
+  function closeModal(modalRef) {
+    var modal = (typeof modalRef === 'string') ? document.getElementById(modalRef) : modalRef;
+    CopellaUI.closeModal(modal);
+  }
+  return { openStationModal: openStationModal, openWelcomeModal: openWelcomeModal, openSettingsModal: openSettingsModal, closeModal: closeModal };
 })();

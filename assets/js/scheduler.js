@@ -2,15 +2,15 @@ window.CopellaScheduler = (function(){
   function openSchedulerModal() {
     var stationOptions = CopellaState.stations.map(function(s, i){ return '<option value="' + i + '">' + s.name + '</option>'; }).join('');
     var disabled = CopellaState.stations.length === 0 ? 'disabled' : '';
-    var content = '<div class="modal-content bg-panel-bg p-6 rounded-large w-full max-w-lg transform scale-95 transition-transform duration-300 flex flex-col">' +
-      '<div class="flex justify-between items-center mb-4 flex-shrink-0"><h2 class="text-xl font-bold">Планировщик записей</h2><button class="close-btn text-2xl text-text-secondary">&times;</button></div>' +
-      '<form id="scheduleForm" class="flex flex-col gap-4 flex-shrink-0">' +
+    var content = '<div class="modal-content bg-panel-bg p-5 rounded-large w-full max-w-lg transform scale-95 transition-transform duration-300 flex flex-col">' +
+      '<div class="flex justify-between items-center mb-4 flex-shrink-0"><h2 class="text-lg font-bold">Планировщик записей</h2><button class="close-btn text-2xl text-text-secondary">&times;</button></div>' +
+      '<form id="scheduleForm" class="flex flex-col gap-3 flex-shrink-0">' +
       '<select id="scheduleStation" required ' + disabled + ' class="w-full p-3 border border-border-color rounded-small text-base bg-bg-color text-text-primary appearance-none focus:ring-2 focus:ring-accent/50 outline-none">' + (stationOptions || '<option>Нет доступных станций</option>') + '</select>' +
       '<input type="datetime-local" id="scheduleStartTime" required class="w-full p-3 border border-border-color rounded-small text-base bg-bg-color text-text-primary focus:ring-2 focus:ring-accent/50 outline-none" style="color-scheme: dark;">' +
       '<input type="number" id="scheduleDuration" placeholder="Длительность (в минутах)" min="1" required class="w-full p-3 border border-border-color rounded-small text-base bg-bg-color text-text-primary focus:ring-2 focus:ring-accent/50 outline-none">' +
       '<button type="submit" class="w-full p-3 text-base font-bold rounded-small border-none bg-accent text-bg-color cursor-pointer" ' + disabled + '>Добавить</button>' +
       '</form><hr class="my-4 border-border-color flex-shrink-0"><div class="flex-grow overflow-y-auto"><div id="scheduleList"></div></div>' +
-      '<p class="text-xs text-text-secondary mt-4 text-center flex-shrink-0"><strong>Важно:</strong> приложение автоматически переключит станцию и начнет запись. Для этого вкладка должна быть открытой.</p></div>';
+      '<p class="text-xs text-text-secondary mt-3 text-center flex-shrink-0"><strong>Важно:</strong> приложение автоматически переключит станцию и начнет запись. Для этого вкладка должна быть открытой.</p></div>';
     CopellaUI.openModal(CopellaDOM.schedulerModal, content);
     renderScheduleList();
     CopellaDOM.schedulerModal.querySelector('.close-btn').onclick = function(){ CopellaUI.closeModal(CopellaDOM.schedulerModal); };
@@ -25,11 +25,11 @@ window.CopellaScheduler = (function(){
       var item = document.createElement('div');
       var statusInfo = { 'scheduled': { text: 'Запланировано', color: 'bg-accent-blue' }, 'recording': { text: 'В эфире', color: 'bg-record animate-pulse' }, 'finished': { text: 'Завершено', color: 'bg-accent-green' }, 'missed': { text: 'Пропущено', color: 'bg-warning' }, 'pending': { text: 'Скоро', color: 'bg-accent-blue' } };
       var currentStatus = statusInfo[schedule.status] || { text: 'Неизвестно', color: 'bg-gray-500' };
-      item.className = 'flex items-center gap-4 p-2 rounded-medium mb-2 bg-zinc-800';
+      item.className = 'flex items-center gap-3 p-2 rounded-medium mb-2 bg-zinc-800';
       var iconHTML = station.icon ? '<img src="' + station.icon + '" class="w-full h-full object-cover">' : CopellaUI.createPlaceholder(station.name, ['text-lg']);
-      item.innerHTML = '<div class="w-12 h-12 flex-shrink-0 rounded-small overflow-hidden bg-bg-color">' + iconHTML + '</div>' +
-        '<div class="flex-grow overflow-hidden"><p class="font-bold text-base truncate" title="' + station.name + '">' + station.name + '</p>' +
-        '<div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full ' + currentStatus.color + '"></span><p class="text-sm text-text-secondary">' + currentStatus.text + ' &bull; ' + startTime.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) + ' &bull; ' + schedule.duration + ' мин.</p></div></div>' +
+      item.innerHTML = '<div class="w-10 h-10 flex-shrink-0 rounded-small overflow-hidden bg-bg-color">' + iconHTML + '</div>' +
+        '<div class="flex-grow overflow-hidden"><p class="font-bold text-sm truncate" title="' + station.name + '">' + station.name + '</p>' +
+        '<div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full ' + currentStatus.color + '"></span><p class="text-xs text-text-secondary">' + currentStatus.text + ' • ' + startTime.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) + ' • ' + schedule.duration + ' мин.</p></div></div>' +
         '<button data-id="' + schedule.id + '" class="delete-schedule-btn p-2 rounded-full text-text-secondary hover:bg-white/10 hover:text-record transition-colors" title="Удалить">' + CopellaConfig.ICONS.trash + '</button>';
       listEl.appendChild(item);
     });

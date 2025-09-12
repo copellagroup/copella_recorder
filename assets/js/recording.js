@@ -100,7 +100,13 @@ window.CopellaRecording = (function(){
   function updateNewRecordingBadge() { CopellaDOM.newRecordingBadge.classList.toggle('hidden', !CopellaState.hasNewRecordings); }
   function openRecordingsModal() {
     CopellaState.hasNewRecordings = false; updateNewRecordingBadge();
-    var content = '<div class="modal-content bg-panel-bg p-6 rounded-large w-full max-w-lg transform scale-95 transition-transform duration-300 flex flex-col"><div class="flex justify-between items-center mb-4 flex-shrink-0"><h2 class="text-xl font-bold">Мои Записи</h2><button class="close-btn text-2xl text-text-secondary">&times;</button></div><div class="flex-grow overflow-y-auto"><div id="recordingsList"></div></div></div>';
+    var content = '<div class="modal-content bg-panel-bg p-5 rounded-large w-full max-w-lg transform scale-95 transition-transform duration-300 flex flex-col">'
+      + '<div class="flex justify-between items-center mb-4 flex-shrink-0">'
+      + '<h2 class="text-lg font-bold">Мои Записи</h2>'
+      + '<button class="close-btn text-2xl text-text-secondary">&times;</button>'
+      + '</div>'
+      + '<div class="flex-grow overflow-y-auto"><div id="recordingsList"></div></div>'
+      + '</div>';
     CopellaUI.openModal(CopellaDOM.recordingsModal, content);
     renderRecordingsList();
     CopellaDOM.recordingsModal.querySelector('.close-btn').onclick = function(){ CopellaUI.closeModal(CopellaDOM.recordingsModal); };
@@ -112,11 +118,11 @@ window.CopellaRecording = (function(){
       if (!recordings || recordings.length === 0) { listEl.innerHTML = '<p class="text-center text-text-secondary py-8">У вас пока нет записей</p>'; return; }
       recordings.sort(function(a,b){ return b.id - a.id; }).forEach(function(rec){
         var item = document.createElement('div');
-        item.className = 'flex items-center gap-4 p-2 rounded-medium mb-2 bg-zinc-800';
+        item.className = 'flex items-center gap-3 p-2 rounded-medium mb-2 bg-zinc-800';
         var iconHTML = rec.stationIcon ? '<img src="' + rec.stationIcon + '" class="w-full h-full object-cover">' : CopellaUI.createPlaceholder(rec.stationName, ['text-lg']);
         var date = new Date(rec.date); var minutes = Math.floor(rec.duration / 60); var seconds = rec.duration % 60; var fileExtension = rec.blob.type && rec.blob.type.indexOf('mpeg') > -1 ? 'mp3' : 'webm';
-        item.innerHTML = '<div class="w-12 h-12 flex-shrink-0 rounded-small overflow-hidden bg-bg-color">' + iconHTML + '</div>' +
-          '<div class="flex-grow overflow-hidden"><p class="font-bold text-base truncate" title="' + rec.stationName + '">' + rec.stationName + '</p><p class="text-sm text-text-secondary">' + date.toLocaleDateString() + ' &bull; ' + minutes + 'м ' + seconds + 'с &bull; <span class="uppercase font-semibold">' + fileExtension + '</span></p></div>' +
+        item.innerHTML = '<div class="w-10 h-10 flex-shrink-0 rounded-small overflow-hidden bg-bg-color">' + iconHTML + '</div>' +
+          '<div class="flex-grow overflow-hidden"><p class="font-bold text-sm truncate" title="' + rec.stationName + '">' + rec.stationName + '</p><p class="text-xs text-text-secondary">' + date.toLocaleDateString() + ' • ' + minutes + 'м ' + seconds + 'с • <span class="uppercase font-semibold">' + fileExtension + '</span></p></div>' +
           '<div class="flex-shrink-0 flex gap-1"><button data-id="' + rec.id + '" class="download-rec-btn p-2 rounded-full text-text-secondary hover:bg-white/10 hover:text-accent-green transition-colors" title="Скачать">' + CopellaConfig.ICONS.download + '</button><button data-id="' + rec.id + '" class="delete-rec-btn p-2 rounded-full text-text-secondary hover:bg-white/10 hover:text-record transition-colors" title="Удалить">' + CopellaConfig.ICONS.trash + '</button></div>';
         listEl.appendChild(item);
       });

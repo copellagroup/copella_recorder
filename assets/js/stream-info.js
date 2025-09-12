@@ -62,7 +62,7 @@ window.CopellaStreamInfo = (function(){
     }
     
     var modal = document.getElementById('settingsModal'); // Переиспользуем модал
-    
+
     var infoHTML = '<div class="space-y-3">';
     infoHTML += '<div class="grid grid-cols-2 gap-2"><div class="bg-bg-color p-2 rounded-small"><div class="text-xs text-text-secondary">Станция</div><div class="text-sm text-text-primary font-bold">' + details.stationName + '</div></div>';
     infoHTML += '<div class="bg-bg-color p-2 rounded-small"><div class="text-xs text-text-secondary">Тип потока</div><div class="text-sm text-text-primary">' + details.streamType + '</div></div></div>';
@@ -81,16 +81,16 @@ window.CopellaStreamInfo = (function(){
     infoHTML += '<div class="bg-bg-color p-2 rounded-small"><div class="text-xs text-text-secondary">Время обновления</div><div class="text-xs text-text-primary">' + new Date(details.timestamp).toLocaleString() + '</div></div>';
     infoHTML += '</div>';
     
-    modal.innerHTML = '<div class="modal-content bg-panel-bg rounded-large p-6 max-w-lg w-full mx-4"><div class="flex justify-between items-center mb-6"><h3 class="text-xl font-bold text-text-primary">Информация о потоке</h3><button class="close-modal text-text-secondary hover:text-accent transition-colors"><svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"></path></svg></button></div>' + infoHTML + '</div>';
-    
-    modal.classList.remove('opacity-0', 'pointer-events-none');
-    modal.classList.add('opacity-100');
-    
-    // Обработчики
-    modal.querySelector('.close-modal').onclick = function() { CopellaModals.closeModal('settingsModal'); };
-    
-    // Закрытие по клику вне модального окна
-    modal.onclick = function(e) { if (e.target === modal) CopellaModals.closeModal('settingsModal'); };
+    var content = '<div class="modal-content bg-panel-bg rounded-large p-5 max-w-lg w-full mx-4">'
+      + '<div class="flex justify-between items-center mb-4">'
+      + '<h3 class="text-lg font-bold text-text-primary">Информация о потоке</h3>'
+      + '<button class="close-btn text-2xl text-text-secondary">&times;</button>'
+      + '</div>'
+      + infoHTML
+      + '</div>';
+
+    CopellaUI.openModal(modal, content);
+    modal.querySelector('.close-btn').onclick = function(){ CopellaUI.closeModal(modal); };
   }
   
   return {
