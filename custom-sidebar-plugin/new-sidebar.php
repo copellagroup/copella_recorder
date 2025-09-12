@@ -52,9 +52,11 @@ add_action('wp_enqueue_scripts', function () {
     // Проверяем, находимся ли мы на странице copella-recorder
     $is_recorder_page = isCopellaRecorderPage();
 
-    // Sidebar CSS
-    $css_sidebar = $url . 'sidebar.css';
-    wp_enqueue_style('cp-sidebar-nextgen', $css_sidebar, array(), file_exists($base.'sidebar.css') ? filemtime($base.'sidebar.css') : null);
+    // Sidebar CSS - загружаем только если НЕ страница copella-recorder
+    if (!$is_recorder_page) {
+        $css_sidebar = $url . 'sidebar.css';
+        wp_enqueue_style('cp-sidebar-nextgen', $css_sidebar, array(), file_exists($base.'sidebar.css') ? filemtime($base.'sidebar.css') : null);
+    }
 
     // Header CSS - загружаем только если НЕ страница copella-recorder
     if (!$is_recorder_page) {
@@ -70,11 +72,13 @@ add_action('wp_enqueue_scripts', function () {
     if (function_exists('wp_script_add_data')) { wp_script_add_data('gsap', 'strategy', 'defer'); }
     wp_enqueue_script('gsap');
 
-    // Sidebar JS
-    $js_sidebar = $url . 'sidebar.js';
-    wp_register_script('cp-sidebar-nextgen', $js_sidebar, array('gsap'), file_exists($base.'sidebar.js') ? filemtime($base.'sidebar.js') : null, array('in_footer' => true));
-    if (function_exists('wp_script_add_data')) { wp_script_add_data('cp-sidebar-nextgen', 'strategy', 'defer'); }
-    wp_enqueue_script('cp-sidebar-nextgen');
+    // Sidebar JS - загружаем только если НЕ страница copella-recorder
+    if (!$is_recorder_page) {
+        $js_sidebar = $url . 'sidebar.js';
+        wp_register_script('cp-sidebar-nextgen', $js_sidebar, array('gsap'), file_exists($base.'sidebar.js') ? filemtime($base.'sidebar.js') : null, array('in_footer' => true));
+        if (function_exists('wp_script_add_data')) { wp_script_add_data('cp-sidebar-nextgen', 'strategy', 'defer'); }
+        wp_enqueue_script('cp-sidebar-nextgen');
+    }
 
     // Header JS - загружаем только если НЕ страница copella-recorder
     if (!$is_recorder_page) {
@@ -98,7 +102,9 @@ add_action('wp_body_open', function() {
         include __DIR__ . '/header-template.php';
     }
     
-    // Sidebar показываем всегда
-    include __DIR__ . '/sidebar-template.php';
+    // Показываем сайдбар только если НЕ страница copella-recorder
+    if (!$is_recorder_page) {
+        include __DIR__ . '/sidebar-template.php';
+    }
 });
 
