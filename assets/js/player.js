@@ -70,26 +70,18 @@ window.CopellaPlayer = (function(){
     } else if (isIcecastStream(streamUrl)) {
       playIcecastStream(streamUrl);
     } else {
-      playNatively(streamUrl);
+      // Для потоков без явного расширения сначала пробуем HLS
+      tryHlsFirst(streamUrl);
     }
     CopellaStorage.setLastPlayed(index);
   }
 
   function isHlsStream(url) {
-    // Расширенная проверка для HLS потоков
+    // Проверяем только расширения файлов
     var hlsExtensions = ['.m3u8', '.m3u'];
-    var hlsKeywords = ['transmit', 'stream', 'live', 'radio'];
     
-    // Проверяем расширения
     for (var i = 0; i < hlsExtensions.length; i++) {
       if (url.indexOf(hlsExtensions[i]) > -1) {
-        return Hls.isSupported();
-      }
-    }
-    
-    // Проверяем ключевые слова в URL
-    for (var j = 0; j < hlsKeywords.length; j++) {
-      if (url.indexOf(hlsKeywords[j]) > -1) {
         return Hls.isSupported();
       }
     }
@@ -99,6 +91,68 @@ window.CopellaPlayer = (function(){
 
   function isIcecastStream(url) {
     return url.indexOf('icecast') > -1 || url.indexOf('shoutcast') > -1 || url.indexOf('stream') > -1;
+  }
+
+  function tryHlsFirst(streamUrl) {
+    // Сначала пробуем как HLS поток
+    try { 
+      CopellaState.hls.destroy(); 
+    } catch(e) {}
+    
+    var hlsConfig = {
+      enableWorker: true,
+      lowLatencyMode: true,
+      backBufferLength: 90,
+      maxBufferLength: 30,
+      maxMaxBufferLength: 60,
+      liveSyncDurationCount: 3,
+      liveMaxLatencyDurationCount: 5,
+      fragLoadingTimeOut: 15000,
+      manifestLoadingTimeOut: 8000,
+      levelLoadingTimeOut: 8000,
+      startLevel: -1,
+      capLevelToPlayerSize: false,
+      maxLoadingDelay: 4,
+      maxBufferHole: 0.5
+    };
+    
+    CopellaState.hls = new Hls(hlsConfig);
+    CopellaState.hls.loadSource(streamUrl);
+    CopellaState.hls.attachMedia(CopellaDOM.audioPlayer);
+    
+    var hlsFailed = false;
+    
+    CopellaState.hls.on(Hls.Events.MANIFEST_PARSED, function(){ 
+      console.log('HLS manifest parsed successfully (tryHlsFirst)');
+      CopellaDOM.audioPlayer.play().catch(function(err) {
+        console.error('HLS play failed in tryHlsFirst:', err);
+        if (!hlsFailed) {
+          hlsFailed = true;
+          CopellaUI.showToast('HLS не работает, пробуем нативное воспроизведение', 'info');
+          playNatively(streamUrl);
+        }
+      }); 
+    });
+    
+    CopellaState.hls.on(Hls.Events.ERROR, function(event, data){ 
+      console.error('HLS error in tryHlsFirst:', data);
+      if (data.fatal && !hlsFailed) {
+        hlsFailed = true;
+        console.log('HLS failed, switching to native playback');
+        CopellaUI.showToast('HLS не поддерживается, переключаемся на нативное воспроизведение', 'info');
+        playNatively(streamUrl);
+      }
+    });
+    
+    // Таймаут для HLS - если за 10 секунд не загрузился, переходим на нативное
+    setTimeout(function() {
+      if (!hlsFailed && CopellaState.hls && CopellaState.hls.media && CopellaState.hls.media.readyState < 2) {
+        hlsFailed = true;
+        console.log('HLS timeout, switching to native playback');
+        CopellaUI.showToast('HLS загрузка слишком медленная, переключаемся на нативное воспроизведение', 'info');
+        playNatively(streamUrl);
+      }
+    }, 10000);
   }
 
   function playHlsStream(streamUrl) {
