@@ -83,7 +83,6 @@ document.addEventListener('DOMContentLoaded', function(){
       CopellaDOM.schedulerBtn.onclick = function(){ CopellaUI.haptic(); CopellaScheduler.openSchedulerModal(); };
       CopellaDOM.recordingsBtn.onclick = function(){ CopellaUI.haptic(); CopellaRecording.openRecordingsModal(); };
       CopellaDOM.settingsBtn.onclick = function(){ CopellaUI.haptic(); CopellaModals.openSettingsModal(); };
-      CopellaDOM.exportBtn.onclick = function(){ CopellaUI.haptic(); CopellaExport.openExportModal(); };
       CopellaDOM.statsBtn.onclick = function(){ CopellaUI.haptic(); CopellaStats.openStatsModal(); };
       CopellaDOM.streamInfoBtn.onclick = function(){ CopellaUI.haptic(); CopellaStreamInfo.openStreamInfoModal(); };
       
