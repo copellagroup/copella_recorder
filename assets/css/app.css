@@ -1,5 +1,14 @@
 * { -webkit-tap-highlight-color: transparent; }
 input[type="search"]::-webkit-search-cancel-button { display: none; }
+
+/* Gilroy font */
+@font-face {
+  font-family: 'Gilroy';
+  src: url('https://copella.live/assets/fonts/Gilroy-SemiBold.woff') format('woff');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
 .modal .modal-content { max-height: 90vh; }
 #stationListContainer::after,
 #apiSearchResultsContainer::after,
