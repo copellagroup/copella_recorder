@@ -18,7 +18,34 @@ window.CopellaUI = (function(){
     if (extraClasses && extraClasses.length) classes = classes.concat(extraClasses);
     return '<div class="' + classes.join(' ') + '" style="background-color:' + color + ';">' + initial + '</div>';
   }
-  function openModal(modal, content) { modal.innerHTML = content; modal.classList.remove('opacity-0', 'pointer-events-none'); modal.querySelector('.modal-content') && modal.querySelector('.modal-content').classList.remove('scale-95'); }
-  function closeModal(modal) { if (!modal) return; modal.classList.add('opacity-0', 'pointer-events-none'); modal.querySelector('.modal-content') && modal.querySelector('.modal-content').classList.add('scale-95'); }
+  function openModal(modal, content) {
+    if (!modal) return;
+    // Clean up previous listeners if reusing the same modal
+    if (modal._overlayHandler) modal.removeEventListener('click', modal._overlayHandler, false);
+    if (modal._escHandler) document.removeEventListener('keydown', modal._escHandler, false);
+
+    modal.innerHTML = content;
+    modal.classList.remove('opacity-0', 'pointer-events-none');
+    var contentEl = modal.querySelector('.modal-content');
+    if (contentEl) contentEl.classList.remove('scale-95');
+
+    // Close on overlay click
+    modal._overlayHandler = function(e){ if (e.target === modal) closeModal(modal); };
+    modal.addEventListener('click', modal._overlayHandler, false);
+
+    // Close on Escape
+    modal._escHandler = function(e){ if (e.key === 'Escape') closeModal(modal); };
+    document.addEventListener('keydown', modal._escHandler, false);
+  }
+  function closeModal(modal) {
+    if (!modal) return;
+    modal.classList.add('opacity-0', 'pointer-events-none');
+    var contentEl = modal.querySelector('.modal-content');
+    if (contentEl) contentEl.classList.add('scale-95');
+
+    // Detach listeners
+    if (modal._overlayHandler) { modal.removeEventListener('click', modal._overlayHandler, false); modal._overlayHandler = null; }
+    if (modal._escHandler) { document.removeEventListener('keydown', modal._escHandler, false); modal._escHandler = null; }
+  }
   return { haptic: haptic, showToast: showToast, createPlaceholder: createPlaceholder, openModal: openModal, closeModal: closeModal };
 })();
