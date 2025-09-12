@@ -70,6 +70,22 @@ document.addEventListener('DOMContentLoaded', function(){
       CopellaDOM.schedulerBtn.onclick = function(){ CopellaUI.haptic(); CopellaScheduler.openSchedulerModal(); };
       CopellaDOM.recordingsBtn.onclick = function(){ CopellaUI.haptic(); CopellaRecording.openRecordingsModal(); };
       CopellaDOM.settingsBtn.onclick = function(){ CopellaUI.haptic(); CopellaModals.openSettingsModal(); };
+      
+      // Обработчик кнопки "Назад"
+      var backBtn = document.getElementById('backBtn');
+      if (backBtn) {
+        backBtn.onclick = function(){ 
+          CopellaUI.haptic(); 
+          // Проверяем, есть ли история браузера
+          if (window.history.length > 1) {
+            window.history.back();
+          } else {
+            // Если нет истории, перенаправляем на главную страницу сайта
+            window.location.href = '/';
+          }
+        };
+      }
+      
       window.addEventListener('resize', CopellaVisualizer.resizeCanvas);
       CopellaDOM.audioPlayer.onplay = function(){
         CopellaPlayer.updatePlayPauseIcon();
