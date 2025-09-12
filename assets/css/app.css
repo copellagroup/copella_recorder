@@ -192,6 +192,12 @@ html, body { background-color: #0A0A0A; }
 
 .api-search-item {
   scroll-snap-align: start;
+  cursor: grab;
+  user-select: none;
+}
+
+.api-search-item:active {
+  cursor: grabbing;
 }
 
 .api-search-card {
@@ -206,12 +212,41 @@ html, body { background-color: #0A0A0A; }
   padding: 12px;
   height: 100%;
   transition: all 0.2s ease;
+  position: relative;
 }
 
 .api-search-card:hover {
   background: rgba(255,255,255,0.08);
   border-color: rgba(255,255,255,0.12);
   transform: translateY(-2px);
+}
+
+.api-search-card.dragging {
+  transform: rotate(5deg) scale(1.05);
+  z-index: 1000;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+}
+
+.api-search-drag-handle {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 16px;
+  height: 16px;
+  opacity: 0.3;
+  cursor: grab;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.api-search-drag-handle:active {
+  cursor: grabbing;
+}
+
+.api-search-drag-handle svg {
+  width: 12px;
+  height: 12px;
 }
 
 .api-search-thumb {

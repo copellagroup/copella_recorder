@@ -66,7 +66,7 @@
                         </div>
                     </div>
                     <div id="apiSearchResultsContainer" class="overflow-x-auto overflow-y-hidden scroll-snap-type-x-mandatory -webkit-overflow-scrolling-touch scrollbar-width-none -ms-overflow-style-none -ms-touch-action-pan-x touch-action-pan-x-pinch-zoom"></div>
-                    <div id="apiSearchMessage" class="text-center text-text-secondary p-6"></div>
+                    <div id="apiSearchMessage" class="text-center text-text-secondary p-2"></div>
                 </div>
             </div>
             <div id="empty-stations-view" class="text-center text-text-secondary p-8 flex flex-col items-center justify-center flex-grow min-h-[200px] hidden"><svg class="w-20 h-20 mb-6 opacity-30" fill="currentColor" viewBox="0 0 24 24"><path d="M12 3c-4.97 0-9 4.03-9 9v7c0 1.1.9 2 2 2h4v-8H5v-1c0-3.87 3.13-7 7-7s7 3.13 7 7v1h-4v8h4c1.1 0 2-.9 2-2v-7c0-4.97-4.03-9-9-9z"></path></svg><h4 class="text-lg font-bold text-text-primary mb-2">Ваша медиатека пуста</h4><p class="mb-6 max-w-xs">Добавьте радиостанции вручную или найдите новые через поиск.</p><button id="emptyAddBtn" class="inline-flex items-center gap-3 text-base font-bold text-bg-color bg-accent px-6 py-3 rounded-medium transition-transform active:scale-95"><svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"></path></svg><span>Добавить станцию</span></button></div>
