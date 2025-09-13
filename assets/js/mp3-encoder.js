@@ -1,17 +1,25 @@
 /* global self */
+var lamejsLoaded = false;
+
 try {
   importScripts('https://cdn.jsdelivr.net/npm/lamejs@1.2.1/lame.min.js');
+  if (typeof lamejs !== 'undefined') {
+    lamejsLoaded = true;
+  }
 } catch (error) {
   self.postMessage({ type: 'error', message: 'Не удалось загрузить lamejs: ' + error.message });
-  return;
 }
 
-if (typeof lamejs === 'undefined') {
+if (!lamejsLoaded) {
   self.postMessage({ type: 'error', message: 'lamejs не загружен' });
-  return;
 }
 
 self.onmessage = function(event){
+  if (!lamejsLoaded) {
+    self.postMessage({ type: 'error', message: 'lamejs не загружен' });
+    return;
+  }
+  
   var channels = event.data.channels;
   var sampleRate = event.data.sampleRate;
   try {

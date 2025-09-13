@@ -115,7 +115,21 @@ window.CopellaRecording = (function(){
             CopellaUI.showToast('Началась обработка длинной записи. Это может занять несколько минут.', 'info', 5000); 
           }
           if (CopellaState.converterWorker) CopellaState.converterWorker.terminate();
-          CopellaState.converterWorker = new Worker((window.CopellaRuntime ? CopellaRuntime.pluginUrl : '') + 'assets/js/mp3-encoder.js');
+          try {
+            CopellaState.converterWorker = new Worker((window.CopellaRuntime ? CopellaRuntime.pluginUrl : '') + 'assets/js/mp3-encoder.js');
+          } catch (error) {
+            console.error('Failed to create worker:', error);
+            CopellaUI.showToast('Не удалось создать воркер конвертации. Сохраняем в формате WebM.', 'warning', 5000);
+            showConversionProgress(false);
+            // Fallback: сохраняем как WebM
+            var data = { id: Date.now(), stationName: station.name, stationIcon: station.icon, date: new Date().toISOString(), duration: durationInSeconds, blob: audioBlob };
+            CopellaDB.saveRecording(data).then(function(){
+              CopellaState.hasNewRecordings = true;
+              updateNewRecordingBadge();
+              CopellaUI.showToast('Запись WebM сохранена!', 'success');
+            });
+            return;
+          }
           CopellaState.converterWorker.onmessage = function(event){ 
             var type = event.data.type, progress = event.data.progress, mp3Blob = event.data.mp3Blob, message = event.data.message; 
             if (type === 'progress') { 
@@ -137,7 +151,15 @@ window.CopellaRecording = (function(){
           };
           CopellaState.converterWorker.onerror = function(err){ 
             console.error('Worker error:', err);
-            CopellaUI.showToast('Ошибка конвертации: ' + (err.message || 'Неизвестная ошибка'), 'error'); 
+            var errorMessage = 'Ошибка воркера конвертации';
+            if (err.message) {
+              errorMessage += ': ' + err.message;
+            } else if (err.filename) {
+              errorMessage += ' в файле: ' + err.filename;
+            } else {
+              errorMessage += ': Неизвестная ошибка';
+            }
+            CopellaUI.showToast(errorMessage, 'error'); 
             showConversionProgress(false);
             if (CopellaState.converterWorker) {
               CopellaState.converterWorker.terminate();

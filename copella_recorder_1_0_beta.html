@@ -289,8 +289,22 @@
                         showToast("Началась обработка длинной записи. Это может занять несколько минут.", "info", 5000); 
                     }
                     if (state.converterWorker) state.converterWorker.terminate();
-                    const workerBlob = new Blob([WORKER_SCRIPT_STRING], { type: 'application/javascript' });
-                    state.converterWorker = new Worker(URL.createObjectURL(workerBlob));
+                    try {
+                        const workerBlob = new Blob([WORKER_SCRIPT_STRING], { type: 'application/javascript' });
+                        state.converterWorker = new Worker(URL.createObjectURL(workerBlob));
+                    } catch (error) {
+                        console.error('Failed to create worker:', error);
+                        showToast('Не удалось создать воркер конвертации. Сохраняем в формате WebM.', 'warning', 5000);
+                        showConversionProgress(false);
+                        // Fallback: сохраняем как WebM
+                        const data = { id: Date.now(), stationName: station.name, stationIcon: station.icon, date: new Date().toISOString(), duration: durationInSeconds, blob: audioBlob };
+                        DB.saveRecording(data).then(() => {
+                            state.hasNewRecordings = true;
+                            updateNewRecordingBadge();
+                            showToast('Запись WebM сохранена!', 'success');
+                        });
+                        return;
+                    }
                     state.converterWorker.onmessage = async (event) => {
                         const { type, progress, mp3Blob, message } = event.data;
                         if (type === 'progress') { 
@@ -311,7 +325,15 @@
                     };
                     state.converterWorker.onerror = (err) => { 
                         console.error('Worker error:', err);
-                        showToast('Ошибка конвертации: ' + (err.message || 'Неизвестная ошибка'), 'error');
+                        let errorMessage = 'Ошибка воркера конвертации';
+                        if (err.message) {
+                            errorMessage += ': ' + err.message;
+                        } else if (err.filename) {
+                            errorMessage += ' в файле: ' + err.filename;
+                        } else {
+                            errorMessage += ': Неизвестная ошибка';
+                        }
+                        showToast(errorMessage, 'error');
                         showConversionProgress(false);
                         if (state.converterWorker) {
                             state.converterWorker.terminate();
