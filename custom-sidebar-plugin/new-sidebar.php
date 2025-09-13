@@ -1,8 +1,8 @@
 <?php
 /**
  * Plugin Name: Copella UI (NextGen)
- * Description: Sidebar + Header with search. High-quality, low-jank. Mini rail on desktop with hover expand. Burger drawer on mobile. Accessible and performant.
- * Version: 2.1.0
+ * Description: Sidebar + Header with search. High-quality, low-jank. Mini rail on desktop with burger control. Burger drawer on mobile. Accessible and performant.
+ * Version: 2.2.0
  * Author: Copella
  */
 

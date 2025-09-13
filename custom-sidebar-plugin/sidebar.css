@@ -13,9 +13,9 @@ html.cp-sb-expanded { --cp-sb-left: var(--cp-sb-expanded-w); }
 
 .cp-sb { position: fixed; z-index: 1002; inset: 0 auto 0 0; width: var(--cp-sb-rail-w); pointer-events: none; top: var(--cp-adminbar-h, 0); height: calc(100% - var(--cp-adminbar-h, 0)); }
 .cp-sb__rail { position: fixed; inset: 0 auto 0 0; width: var(--cp-sb-rail-w); background: var(--cp-sb-bg); color: var(--cp-sb-fg); pointer-events: auto; display: flex; flex-direction: column; align-items: center; padding-top: 12px; will-change: width; border-right: 1px solid rgba(255,255,255,.06); overflow: hidden; top: var(--cp-adminbar-h, 0); height: calc(100% - var(--cp-adminbar-h, 0)); }
-.cp-sb__logo { display: flex; align-items: center; justify-content: center; width: 100%; height: 64px; text-decoration: none; }
-.cp-sb__logo--mini { width: 40px; height: auto; display: block; }
-.cp-sb__logo--full { display: none; }
+.cp-sb__logo { display: flex; align-items: center; justify-content: center; width: 100%; height: 48px; text-decoration: none; }
+.cp-sb__logo--mini { width: 32px; height: 32px; display: block; object-fit: contain; }
+.cp-sb__logo--full { display: none; height: 32px; width: auto; object-fit: contain; }
 
 .cp-sb__nav { display: flex; flex-direction: column; gap: 8px; width: 100%; margin-top: 8px; }
 
@@ -64,7 +64,7 @@ html:not(.cp-sb-gsap).cp-sb-expanded .cp-sb__rail { width: var(--cp-sb-expanded-
 html.cp-sb-expanded .cp-sb__logo { justify-content: flex-start; padding-left: 24px; }
 html.cp-sb-expanded .cp-sb__item { display: grid; grid-template-columns: 24px 1fr; align-items: center; justify-content: stretch; justify-items: start; padding: 10px 20px; column-gap: 12px; }
 html.cp-sb-expanded .cp-sb__logo--mini { display: none; }
-html.cp-sb-expanded .cp-sb__logo--full { display: block; height: 44px; }
+html.cp-sb-expanded .cp-sb__logo--full { display: block; height: 32px; width: auto; object-fit: contain; }
 html.cp-sb-expanded .cp-sb__nav { padding-left: 8px; }
 /* Smoothly reveal labels when expanded via burger */
 html.cp-sb-expanded .cp-sb__label { opacity: 1; max-width: 160px; transform: translateX(0); }
@@ -109,9 +109,9 @@ html.cp-sb-expanded .cp-sb__label { opacity: 1; max-width: 160px; transform: tra
     radial-gradient(80px 80px at center, rgba(120,255,180,.30), transparent 60%);
     background-repeat:no-repeat; background-size:180% 180%,150% 150%,200% 200%; background-position:0% 0%,100% 20%,20% 100%; filter:blur(12px); opacity:.9; mix-blend-mode:screen; pointer-events:none; animation:cpSbBtnBlobs 9s ease-in-out infinite alternate }
   .cp-sb__drawer-header { position: sticky; top: 0; display: grid; grid-template-columns: 1fr 44px; align-items: center; gap: 8px; padding: 8px 12px 8px 28px; background: var(--cp-sb-bg); z-index: 1; border-bottom: 1px solid rgba(255,255,255,.06); }
-  .cp-sb__drawer-header .cp-sb__logo { justify-content: flex-start; height: 44px; }
+  .cp-sb__drawer-header .cp-sb__logo { justify-content: flex-start; height: 48px; }
   .cp-sb__drawer-header .cp-sb__logo--mini { display: none; }
-  .cp-sb__drawer-header .cp-sb__logo--full { display: block; height: 32px; }
+  .cp-sb__drawer-header .cp-sb__logo--full { display: block; height: 32px; width: auto; object-fit: contain; }
   .cp-sb__close { position: static; width: 44px; height: 44px; background: rgba(255,255,255,.06); color: var(--cp-sb-fg); border: 1px solid rgba(255,255,255,.12); border-radius: 10px; font-size: 20px; display: grid; place-items: center; }
   .cp-sb__scrim { position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 1100; opacity: 0; visibility: hidden; transition: opacity .28s ease, visibility 0s linear .28s; top: var(--cp-adminbar-h, 0); height: calc(100% - var(--cp-adminbar-h, 0)); }
   .cp-sb__scrim.is-visible { opacity: 1; visibility: visible; transition: opacity .28s ease; }
