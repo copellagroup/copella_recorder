@@ -10,7 +10,7 @@ window.CopellaPlayer = (function(){
       '<div class="station-info text-center flex flex-col justify-center gap-1 w/full overflow-hidden">' +
       '<div id="player-station-name" class="text-2xl font-extrabold truncate flex items-center justify-center gap-2" title="' + station.name + '">' + station.name + '<button id="copyUrlBtn" class="p-1 rounded-full text-text-secondary hover:bg-white/10 hover:text-accent transition-colors" title="Копировать URL потока">' + CopellaConfig.ICONS.copy + '</button></div>' +
       '<div id="player-now-playing" class="text-base font-medium text-text-secondary transition-colors duration-300 whitespace-nowrap overflow-hidden text-ellipsis w-full">Прямой эфир</div>' +
-      '<div id="conversion-progress-container" class="w-full max-w-xs mx-auto text-center hidden mt-2"><p id="conversion-status-text" class="text-sm text-text-secondary mb-1">Обработка...</p><div class="w-full bg-border-color rounded-full h-1.5"><div id="conversion-progress-bar" class="bg-accent-purple h-1.5 rounded-full transition-width duration-300" style="width: 0%"></div></div></div>' +
+      '<div id="conversion-progress-container" class="w-full max-w-xs mx-auto text-center hidden mt-2"><p id="conversion-status-text" class="text-sm text-text-secondary mb-1">Обработка...</p><div class="w-full bg-border-color rounded-full h-1.5"><div id="conversion-progress-bar" class="bg-accent h-1.5 rounded-full transition-width duration-300" style="width: 0%"></div></div></div>' +
       '</div>' +
       '<div class="player-controls flex items-center justify-center gap-2 sm:gap-4 mt-2 w-full">' +
       '<button id="recordButton" class="control-button w-12 h-12 bg-white/10 border border-border-color rounded-full flex justify-center items-center transition-all duration-200 active:scale-90" title="Запись"><div class="record-icon w-4 h-4 bg-record rounded-full"></div></button>' +
@@ -23,12 +23,7 @@ window.CopellaPlayer = (function(){
     if (station) {
       CopellaDOM.playerContent.innerHTML = createPlayerHTML(station);
       
-      // Добавляем эффекты для новых микрофункций
-      var playerArt = document.querySelector('.player-art');
-      if (playerArt) {
-        CopellaUI.addSparkleEffect(playerArt);
-        CopellaUI.createGradientBackground(playerArt, ['#8B5CF6', '#EC4899']);
-      }
+      // Эффекты отключены для строгого дизайна
       
       document.getElementById('recordButton').onclick = function(e){ 
         CopellaUI.haptic(); 

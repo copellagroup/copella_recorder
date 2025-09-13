@@ -3,7 +3,7 @@ window.CopellaUI = (function(){
   function showToast(message, type, duration) {
     if (!type) type = 'info';
     if (!duration) duration = 3000;
-    var colors = { info: 'bg-accent-purple', success: 'bg-accent-green', error: 'bg-error', warning: 'bg-warning' };
+    var colors = { info: 'bg-accent', success: 'bg-accent-green', error: 'bg-error', warning: 'bg-warning' };
     var toast = document.createElement('div');
     toast.className = 'toast p-3 rounded-medium text-center text-sm font-semibold shadow-lg text-bg-color ' + colors[type] + ' animate-fade-in-up';
     toast.textContent = message;
@@ -55,28 +55,18 @@ window.CopellaUI = (function(){
   }
   
   function createGradientBackground(element, colors) {
-    if (!element || !colors) return;
-    var gradient = 'linear-gradient(135deg, ' + colors.join(', ') + ')';
-    element.style.background = gradient;
+    // Отключено для строгого дизайна
+    return;
   }
   
   function addSparkleEffect(element) {
-    if (!element) return;
-    var sparkle = document.createElement('div');
-    sparkle.className = 'sparkle-effect absolute inset-0 pointer-events-none';
-    sparkle.innerHTML = '<div class="sparkle w-1 h-1 bg-accent-pink rounded-full animate-ping absolute top-2 left-2"></div><div class="sparkle w-1 h-1 bg-accent-purple rounded-full animate-ping absolute top-4 right-3" style="animation-delay: 0.5s;"></div><div class="sparkle w-1 h-1 bg-accent-green rounded-full animate-ping absolute bottom-3 left-4" style="animation-delay: 1s;"></div>';
-    element.style.position = 'relative';
-    element.appendChild(sparkle);
+    // Отключено для строгого дизайна
+    return;
   }
   
   function createFloatingButton(text, icon, onClick) {
-    var button = document.createElement('button');
-    button.className = 'floating-btn fixed bottom-6 right-6 w-14 h-14 bg-accent-pink text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center z-40';
-    button.innerHTML = icon || '<svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"></path></svg>';
-    button.title = text;
-    button.addEventListener('click', onClick);
-    document.body.appendChild(button);
-    return button;
+    // Отключено для строгого дизайна
+    return;
   }
   
   function addRippleEffect(element, event) {
