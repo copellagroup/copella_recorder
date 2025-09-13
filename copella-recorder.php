@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Copella Recorder
  * Description: Интернет-радио с записью эфира. Шорткод: [copella_recorder]
- * Version: 1.1.0
+ * Version: 1.2.0
  * Author: Copella
  * Text Domain: copella-recorder
  */

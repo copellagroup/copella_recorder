@@ -41,17 +41,17 @@ window.CopellaModals = (function(){
   }
   function openWelcomeModal() {
     var content = '<div class="modal-content bg-panel-bg p-6 rounded-large w-full max-w-md transform scale-95 transition-transform duration-300">' +
-      '<div class="text-center mb-4"><h2 class="text-xl font-bold">Copella Recorder v1.1 - Обновление</h2></div>' +
+      '<div class="text-center mb-4"><h2 class="text-xl font-bold">Copella Recorder v1.2 - Обновление</h2></div>' +
       '<div class="text-text-secondary space-y-4 text-center">' +
-        '<p class="font-semibold text-accent-green">Новые функции в версии 1.1:</p>' +
+        '<p class="font-semibold text-accent-green">Новые функции в версии 1.2:</p>' +
         '<div class="space-y-3 text-left">' +
-          '<div class="flex items-start gap-2"><span class="text-accent-green font-bold">•</span><span><strong>Профессиональные функции</strong> для радио любителей</span></div>' +
-          '<div class="flex items-start gap-2"><span class="text-accent-green font-bold">•</span><span><strong>Улучшенная обработка</strong> аудиопотоков</span></div>' +
-          '<div class="flex items-start gap-2"><span class="text-accent-green font-bold">•</span><span><strong>Расширенные возможности</strong> записи</span></div>' +
-          '<div class="flex items-start gap-2"><span class="text-accent-green font-bold">•</span><span><strong>Оптимизированная работа</strong> с различными форматами</span></div>' +
-          '<div class="flex items-start gap-2"><span class="text-accent-green font-bold">•</span><span><strong>Серьёзный интерфейс</strong> без отвлекающих элементов</span></div>' +
+          '<div class="flex items-start gap-2"><span class="text-accent-green font-bold">•</span><span><strong>Автоматические плейлисты</strong> из записей</span></div>' +
+          '<div class="flex items-start gap-2"><span class="text-accent-green font-bold">•</span><span><strong>Система тегов</strong> для записей</span></div>' +
+          '<div class="flex items-start gap-2"><span class="text-accent-green font-bold">•</span><span><strong>Поиск по записям</strong> и умное переименование</span></div>' +
+          '<div class="flex items-start gap-2"><span class="text-accent-green font-bold">•</span><span><strong>Экспорт в JSON/CSV/TXT</strong> форматах</span></div>' +
+          '<div class="flex items-start gap-2"><span class="text-accent-green font-bold">•</span><span><strong>Мобильная адаптация</strong> интерфейса</span></div>' +
         '</div>' +
-        '<p class="text-sm mt-4">Добавлено <strong>15 новых функций</strong> для профессиональной работы с радио!</p>' +
+        '<p class="text-sm mt-4">Добавлено <strong>6 новых функций</strong> для удобной работы с записями!</p>' +
       '</div>' +
       '<button id="closeWelcomeBtn" class="w-full p-3 text-base font-bold rounded-small border-none bg-accent text-bg-color cursor-pointer mt-6">Начать работу</button></div>';
     CopellaUI.openModal(CopellaDOM.welcomeModal, content);

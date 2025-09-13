@@ -175,7 +175,7 @@ window.CopellaUI = (function(){
     }, 500);
   }
   
-  // Новые функции версии 1.1
+  // Новые функции версии 1.2
   function createWaveAnimation(element, color) {
     if (!element) return;
     var wave = document.createElement('div');
