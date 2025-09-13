@@ -98,7 +98,7 @@ window.CopellaUI = (function(){
     circle.setAttribute('cy', (size || 60) / 2);
     circle.setAttribute('r', ((size || 60) - 4) / 2);
     circle.setAttribute('fill', 'transparent');
-    circle.setAttribute('stroke', '#8B5CF6');
+    circle.setAttribute('stroke', '#FFFFFF');
     circle.setAttribute('stroke-width', '4');
     circle.setAttribute('stroke-dasharray', '2 * Math.PI * ' + ((size || 60) - 4) / 2);
     circle.setAttribute('stroke-dashoffset', '2 * Math.PI * ' + ((size || 60) - 4) / 2 + ' * (1 - ' + progress + ')');
@@ -106,6 +106,73 @@ window.CopellaUI = (function(){
     svg.appendChild(circle);
     element.appendChild(svg);
     return svg;
+  }
+  
+  // Новые микрофункции
+  function createNotificationBadge(element, count) {
+    if (!element) return;
+    var badge = document.createElement('span');
+    badge.className = 'notification-badge absolute -top-1 -right-1 bg-record text-white text-xs font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1';
+    badge.textContent = count > 99 ? '99+' : count;
+    element.style.position = 'relative';
+    element.appendChild(badge);
+    return badge;
+  }
+  
+  function addPulseEffect(element, color) {
+    if (!element) return;
+    element.style.animation = 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite';
+    element.style.boxShadow = '0 0 0 0 ' + (color || 'rgba(255, 255, 255, 0.4)');
+  }
+  
+  function createTooltip(element, text) {
+    if (!element) return;
+    var tooltip = document.createElement('div');
+    tooltip.className = 'tooltip absolute z-50 px-2 py-1 text-xs font-semibold text-bg-color bg-accent rounded-small opacity-0 pointer-events-none transition-opacity duration-200';
+    tooltip.textContent = text;
+    element.style.position = 'relative';
+    element.appendChild(tooltip);
+    
+    element.addEventListener('mouseenter', function() {
+      tooltip.style.opacity = '1';
+    });
+    
+    element.addEventListener('mouseleave', function() {
+      tooltip.style.opacity = '0';
+    });
+    
+    return tooltip;
+  }
+  
+  function addGlowEffect(element, color) {
+    if (!element) return;
+    element.style.boxShadow = '0 0 20px ' + (color || 'rgba(255, 255, 255, 0.3)');
+    element.style.transition = 'box-shadow 0.3s ease';
+  }
+  
+  function removeGlowEffect(element) {
+    if (!element) return;
+    element.style.boxShadow = 'none';
+  }
+  
+  function createLoadingSpinner(size) {
+    var spinner = document.createElement('div');
+    spinner.className = 'loading-spinner inline-block';
+    spinner.style.width = (size || '20') + 'px';
+    spinner.style.height = (size || '20') + 'px';
+    spinner.style.border = '2px solid rgba(255, 255, 255, 0.3)';
+    spinner.style.borderTop = '2px solid #FFFFFF';
+    spinner.style.borderRadius = '50%';
+    spinner.style.animation = 'spin 1s linear infinite';
+    return spinner;
+  }
+  
+  function addShakeEffect(element) {
+    if (!element) return;
+    element.style.animation = 'shake 0.5s ease-in-out';
+    setTimeout(function() {
+      element.style.animation = '';
+    }, 500);
   }
   
   return { 
@@ -119,6 +186,13 @@ window.CopellaUI = (function(){
     addSparkleEffect: addSparkleEffect,
     createFloatingButton: createFloatingButton,
     addRippleEffect: addRippleEffect,
-    createProgressRing: createProgressRing
+    createProgressRing: createProgressRing,
+    createNotificationBadge: createNotificationBadge,
+    addPulseEffect: addPulseEffect,
+    createTooltip: createTooltip,
+    addGlowEffect: addGlowEffect,
+    removeGlowEffect: removeGlowEffect,
+    createLoadingSpinner: createLoadingSpinner,
+    addShakeEffect: addShakeEffect
   };
 })();
