@@ -41,9 +41,9 @@ window.CopellaModals = (function(){
   }
   function openWelcomeModal() {
     var content = '<div class="modal-content bg-panel-bg p-6 rounded-large w-full max-w-md transform scale-95 transition-transform duration-300">' +
-      '<div class="text-center mb-4"><h2 class="text-xl font-bold">Copella Recorder v1.2 - Обновление</h2></div>' +
+      '<div class="text-center mb-4"><h2 class="text-xl font-bold">Copella Recorder v1.1 - Обновление</h2></div>' +
       '<div class="text-text-secondary space-y-4 text-center">' +
-        '<p class="font-semibold text-accent-green">Новые функции в версии 1.2:</p>' +
+        '<p class="font-semibold text-accent-green">Новые функции в версии 1.1:</p>' +
         '<div class="space-y-3 text-left">' +
           '<div class="flex items-start gap-2"><span class="text-accent-green font-bold">•</span><span><strong>Автоматические плейлисты</strong> из записей</span></div>' +
           '<div class="flex items-start gap-2"><span class="text-accent-green font-bold">•</span><span><strong>Система тегов</strong> для записей</span></div>' +
@@ -81,7 +81,7 @@ window.CopellaModals = (function(){
       '</div></div>' +
       '</div></div>' +
       '</div>' +
-      '<div class="text-center text-xs text-text-secondary pt-2 mt-3"><strong>Copella Recorder 1.2</strong><br>© 2025 Copella</div>' +
+      '<div class="text-center text-xs text-text-secondary pt-2 mt-3"><strong>Copella Recorder 1.1</strong><br>© 2025 Copella</div>' +
       '</div>';
     CopellaUI.openModal(CopellaDOM.settingsModal, content);
     CopellaDOM.settingsModal.querySelector('.close-btn').onclick = function(){ CopellaUI.closeModal(CopellaDOM.settingsModal); };
