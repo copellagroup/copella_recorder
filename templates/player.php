@@ -1,7 +1,7 @@
 <?php if (!defined('ABSPATH')) { exit; } ?>
-<div class="app-container flex flex-col h-full max-w-4xl mx-auto w-full p-4 sm:p-6 pb-[calc(1rem+env(safe-area-inset-bottom))] bg-bg-color text-text-primary font-girly min-h-screen antialiased">
+<div class="app-container flex flex-col h-full max-w-4xl mx-auto w-full p-4 sm:p-6 pb-[calc(1rem+env(safe-area-inset-bottom))] bg-bg-color text-text-primary font-gilroy min-h-screen antialiased">
     <!-- Компактный хедер для встраивания в существующий сайт -->
-    <header class="app-header fixed top-0 left-0 right-0 z-50 flex justify-between items-center h-16 sm:h-18 px-4 bg-[#1a1a1a] border-b border-white/10 font-girly">
+    <header class="app-header fixed top-0 left-0 right-0 z-50 flex justify-between items-center h-16 sm:h-18 px-4 bg-[#1a1a1a] border-b border-white/10 font-gilroy">
         <!-- Кнопка "Назад" -->
         <div class="back-button-container">
             <button id="backBtn" class="back-btn flex items-center gap-2 text-text-secondary hover:text-accent transition-colors group" title="Вернуться назад">

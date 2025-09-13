@@ -1,13 +1,13 @@
-# Copella Recorder - Обновление до Girly шрифта
+# Copella Recorder - Обновление до Gilroy шрифта
 
-## Версия 1.0 - Girly Edition
+## Версия 1.0 - Gilroy Edition
 
 ### Основные изменения:
 
-1. **Шрифт Girly**
-   - Заменен шрифт Manrope на Girly во всех файлах
-   - Обновлены ссылки на Google Fonts
-   - Изменены CSS классы с `font-manrope` на `font-girly`
+1. **Шрифт Gilroy**
+   - Заменен шрифт Manrope на Gilroy во всех файлах
+   - Используется оригинальный шрифт с copella.live
+   - Изменены CSS классы с `font-manrope` на `font-gilroy`
 
 2. **Цветовая схема**
    - Убраны сине-белые оттенки (`accent-blue`)
