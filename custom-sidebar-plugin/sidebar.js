@@ -67,14 +67,13 @@
 
   
   try {
-    var prefersHover = window.matchMedia('(hover: hover) and (pointer: fine)');
     function setExpandedState(expanded){
       if (expanded) { htmlEl.classList.add('cp-sb-expanded'); }
       else { htmlEl.classList.remove('cp-sb-expanded'); }
     }
 
-    // GSAP-powered hover animation for desktop, with graceful fallback
-    if (prefersHover && prefersHover.matches && rail) {
+    // GSAP-powered animation for desktop burger control only
+    if (rail && window.innerWidth > 768) {
       var usingGsap = typeof window.gsap !== 'undefined';
       var tl = usingGsap ? window.gsap.timeline({ paused: true, defaults: { ease: 'power2.out' } }) : null;
       var railWidthMini = getComputedStyle(document.documentElement).getPropertyValue('--cp-sb-rail-w').trim();
@@ -101,16 +100,6 @@
         tl.to(rail, { width: railWidthFull, duration: 0.24 }, 0);
         tl.to(labels, { opacity: 1, x: 0, maxWidth: 160, duration: 0.2, stagger: 0.02 }, 0.04);
 
-        function onEnter(){ tl.play(); setExpandedState(true); }
-        function onLeave(){ 
-          if (isPinned) return;
-          tl.reverse(); 
-          // Delay state change to allow animation to complete
-          setTimeout(function(){ if (!isPinned) setExpandedState(false); }, 240);
-        }
-        rail.addEventListener('mouseenter', onEnter, false);
-        rail.addEventListener('mouseleave', onLeave, false);
-
         window.addEventListener('resize', function(){ if (window.innerWidth <= 768) { isPinned = false; tl.pause(0); setExpandedState(false); } }, false);
 
         // Minimal API for desktop pin/unpin controlled from header toggle
@@ -130,11 +119,7 @@
           window.cpSidebar.togglePinned = function(){ if (isPinned) window.cpSidebar.collapsePinned(); else window.cpSidebar.expandPinned(); };
         } catch(_){ /* no-op */ }
       } else {
-        // Fallback to CSS-driven state toggle for very old browsers (e.g., Lumia IE/Edge legacy)
-        function onRailEnter(){ setExpandedState(true); }
-        function onRailLeave(){ setExpandedState(false); }
-        rail.addEventListener('mouseenter', onRailEnter, false);
-        rail.addEventListener('mouseleave', onRailLeave, false);
+        // Fallback to CSS-driven state toggle for very old browsers
         window.addEventListener('resize', function(){ if (window.innerWidth <= 768) setExpandedState(false); }, false);
       }
     }

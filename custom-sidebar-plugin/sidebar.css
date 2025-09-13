@@ -42,7 +42,7 @@ html.cp-sb-expanded { --cp-sb-left: var(--cp-sb-expanded-w); }
 .cp-sb__label { display: inline-block; white-space: nowrap; font-weight: 600; min-width: 0; overflow: hidden; text-overflow: ellipsis; opacity: 0; max-width: 0; transform: translateX(-4px); transition: opacity .2s ease, transform .2s ease, max-width .24s ease; }
 
 .cp-sb__donate{ position:relative; background: linear-gradient(90deg,#00c853 0%, #00e676 100%); color:#000; font-weight:800; border-radius:12px; margin-left:8px; margin-right:8px; width: calc(100% - 16px); box-sizing: border-box; overflow: hidden; overflow: clip; /* better clipping for blurred blobs */ clip-path: inset(0 round 12px); contain: paint; }
-html.cp-sb-expanded .cp-sb__donate, .cp-sb__rail:hover .cp-sb__donate { grid-template-columns: 24px 1fr; margin-left:0; margin-right:0; width: 100%; }
+html.cp-sb-expanded .cp-sb__donate { grid-template-columns: 24px 1fr; margin-left:0; margin-right:0; width: 100%; }
 .cp-sb__donate .cp-sb__icon{ color:#000 }
 .cp-sb__donate:hover, .cp-sb__donate:focus{ background: linear-gradient(90deg,#00d65d 0%, #27ee8a 100%); }
 .cp-sb__donate::before{ content:""; position:absolute; inset:-15%; background:
@@ -59,19 +59,15 @@ html.cp-sb-expanded .cp-sb__donate, .cp-sb__rail:hover .cp-sb__donate { grid-tem
   /* Limit hover-scale effects to real pointer devices */
   .cp-sb__item:hover .cp-sb__icon { transform: scale(1.07); }
 }
-/* Disable CSS hover width change when GSAP is driving the animation */
-html:not(.cp-sb-gsap) .cp-sb__rail:hover,
-html:not(.cp-sb-gsap) .cp-sb__rail:focus-within { width: var(--cp-sb-expanded-w); align-items: flex-start; }
-/* When pinned via desktop toggle, expand rail as well (CSS fallback when GSAP inactive) */
+/* Disable CSS hover width change - only use burger control now */
 html:not(.cp-sb-gsap).cp-sb-expanded .cp-sb__rail { width: var(--cp-sb-expanded-w); align-items: flex-start; }
-html.cp-sb-expanded .cp-sb__logo, .cp-sb__rail:hover .cp-sb__logo { justify-content: flex-start; padding-left: 24px; }
-html.cp-sb-expanded .cp-sb__item, .cp-sb__rail:hover .cp-sb__item { display: grid; grid-template-columns: 24px 1fr; align-items: center; justify-content: stretch; justify-items: start; padding: 10px 20px; column-gap: 12px; }
-html.cp-sb-expanded .cp-sb__logo--mini, .cp-sb__rail:hover .cp-sb__logo--mini { display: none; }
-html.cp-sb-expanded .cp-sb__logo--full, .cp-sb__rail:hover .cp-sb__logo--full { display: block; height: 44px; }
-html.cp-sb-expanded .cp-sb__nav, .cp-sb__rail:hover .cp-sb__nav { padding-left: 8px; }
-/* Smoothly reveal labels when expanded or hovered */
-html.cp-sb-expanded .cp-sb__label,
-.cp-sb__rail:hover .cp-sb__label { opacity: 1; max-width: 160px; transform: translateX(0); }
+html.cp-sb-expanded .cp-sb__logo { justify-content: flex-start; padding-left: 24px; }
+html.cp-sb-expanded .cp-sb__item { display: grid; grid-template-columns: 24px 1fr; align-items: center; justify-content: stretch; justify-items: start; padding: 10px 20px; column-gap: 12px; }
+html.cp-sb-expanded .cp-sb__logo--mini { display: none; }
+html.cp-sb-expanded .cp-sb__logo--full { display: block; height: 44px; }
+html.cp-sb-expanded .cp-sb__nav { padding-left: 8px; }
+/* Smoothly reveal labels when expanded via burger */
+html.cp-sb-expanded .cp-sb__label { opacity: 1; max-width: 160px; transform: translateX(0); }
 
 @media (min-width: 769px) {
   body { padding-left: var(--cp-sb-left); transition: padding-left .24s ease; }
