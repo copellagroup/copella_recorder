@@ -42,6 +42,8 @@ html.cp-sb-expanded { --cp-sb-left: var(--cp-sb-expanded-w); }
 .cp-sb__archive .cp-sb__icon{ color:#ff6b35 }
 .cp-sb__archive:hover, .cp-sb__archive:focus{ background: rgba(255,107,53,.08); }
 
+.cp-sb__recorder .cp-sb__icon img{ width:24px; height:24px; display:block; object-fit:contain; }
+
 /* Prevent touch zoom/jump on tap and improve mobile UX */
 .cp-sb__item, .cp-sb__close { -ms-touch-action: manipulation; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
 .cp-sb__label { display: inline-block; white-space: nowrap; font-weight: 600; min-width: 0; overflow: hidden; text-overflow: ellipsis; opacity: 0; max-width: 0; transform: translateX(-4px); transition: opacity .2s ease, transform .2s ease, max-width .24s ease; }
@@ -110,6 +112,7 @@ html.cp-sb-expanded .cp-sb__label { opacity: 1; max-width: 160px; transform: tra
   .cp-sb__drawer-item.cp-sb__archive .cp-sb__icon{ color:#ff6b35 }
   .cp-sb__drawer-item.cp-sb__archive .cp-sb__icon img{ width:24px; height:24px; display:block; object-fit:contain; }
   .cp-sb__drawer-item.cp-sb__archive:focus, .cp-sb__drawer-item.cp-sb__archive:hover{ background: rgba(255,107,53,.08); }
+  .cp-sb__drawer-item.cp-sb__recorder .cp-sb__icon img{ width:24px; height:24px; display:block; object-fit:contain; }
   .cp-sb__drawer-item.cp-sb__donate::before{ content:""; position:absolute; inset:-15%; background:
     radial-gradient(70px 70px at center, rgba(0,255,140,.40), transparent 60%),
     radial-gradient(60px 60px at center, rgba(0,210,160,.35), transparent 60%),

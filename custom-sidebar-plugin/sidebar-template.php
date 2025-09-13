@@ -49,7 +49,7 @@
       <nav class="cp-sb__services-nav">
         <a class="cp-sb__item cp-sb__recorder" href="https://copella.live/copella-recorder" title="Copella Recorder">
           <span class="cp-sb__icon" aria-hidden="true">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g fill="currentColor"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6" fill="#1a1a1a"/><circle cx="12" cy="12" r="2"/></g></svg>
+            <img src="https://copella.live/wp-content/uploads/2025/09/Новый-проект-509-50036E7.png" alt="" width="24" height="24" loading="eager" decoding="async" fetchpriority="high" />
           </span>
           <span class="cp-sb__label">Copella Recorder</span>
         </a>
@@ -118,7 +118,7 @@
       <nav class="cp-sb__drawer-services-nav">
         <a class="cp-sb__drawer-item cp-sb__recorder" href="https://copella.live/copella-recorder" title="Copella Recorder">
           <span class="cp-sb__icon" aria-hidden="true">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g fill="currentColor"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6" fill="#1a1a1a"/><circle cx="12" cy="12" r="2"/></g></svg>
+            <img src="https://copella.live/wp-content/uploads/2025/09/Новый-проект-509-50036E7.png" alt="" width="24" height="24" loading="eager" decoding="async" fetchpriority="high" />
           </span>
           <span class="cp-sb__label">Copella Recorder</span>
         </a>
