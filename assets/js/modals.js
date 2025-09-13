@@ -59,23 +59,54 @@ window.CopellaModals = (function(){
   }
   function openSettingsModal() {
     var currentFormat = CopellaStorage.getRecordingFormat();
-    var content = '<div class="modal-content bg-panel-bg p-5 rounded-large w-full max-w-sm transform scale-95 transition-transform duration-300 flex flex-col">' +
-      '<div class="flex justify-between items-center mb-4 flex-shrink-0"><h2 class="text-lg font-bold">Настройки</h2><button class="close-btn text-xl text-text-secondary">&times;</button></div>' +
-      '<div class="space-y-4">' +
+    var content = '<div class="modal-content bg-panel-bg p-4 rounded-large w-full max-w-sm transform scale-95 transition-transform duration-300 flex flex-col">' +
+      '<div class="flex justify-between items-center mb-3 flex-shrink-0"><h2 class="text-lg font-bold">Настройки</h2><button class="close-btn text-xl text-text-secondary">&times;</button></div>' +
+      '<div class="flex border-b border-border-color mb-3">' +
+      '<button class="tab-btn px-3 py-2 text-sm font-bold border-b-2 border-accent text-accent" data-tab="recording">Запись</button>' +
+      '<button class="tab-btn px-3 py-2 text-sm font-bold border-b-2 border-transparent text-text-secondary" data-tab="data">Данные</button>' +
+      '</div>' +
+      '<div id="tab-content" class="flex-grow">' +
+      '<div id="recording-tab" class="tab-panel">' +
+      '<div class="space-y-3">' +
       '<div><h3 class="font-bold text-text-primary mb-2 text-sm">Формат записи</h3><div class="flex flex-col gap-1" id="formatChooser">' +
       '<div class="flex items-center gap-2 p-2 bg-zinc-800 rounded-small cursor-pointer text-sm" data-format="mp3"><div class="custom-radio w-4 h-4 rounded-full border-2 border-border-color flex items-center justify-center ' + (currentFormat === 'mp3' ? 'border-accent' : '') + '"><div class="w-2 h-2 rounded-full bg-accent ' + (currentFormat === 'mp3' ? '' : 'hidden') + '"></div></div><span>MP3 (универсальный)</span></div>' +
       '<div class="flex items-center gap-2 p-2 bg-zinc-800 rounded-small cursor-pointer text-sm" data-format="webm"><div class="custom-radio w-4 h-4 rounded-full border-2 border-border-color flex items-center justify-center ' + (currentFormat === 'webm' ? 'border-accent' : '') + '"><div class="w-2 h-2 rounded-full bg-accent ' + (currentFormat === 'webm' ? '' : 'hidden') + '"></div></div><span>WebM (быстро)</span></div>' +
       '</div></div>' +
-      '<div><h3 class="font-bold text-text-primary mb-2 text-sm">Данные</h3><div class="flex gap-2">' +
+      '</div></div>' +
+      '<div id="data-tab" class="tab-panel hidden">' +
+      '<div class="space-y-3">' +
+      '<div><h3 class="font-bold text-text-primary mb-2 text-sm">Управление данными</h3><div class="flex gap-2">' +
       '<button id="exportBtn" class="flex-1 p-2 text-sm font-bold rounded-small border border-border-color bg-zinc-800 text-text-primary cursor-pointer">Экспорт</button>' +
       '<label class="flex-1 p-2 text-sm font-bold rounded-small border border-border-color bg-zinc-800 text-text-primary cursor-pointer text-center">Импорт <input type="file" id="importFile" accept=".json" class="hidden"></label>' +
       '</div></div>' +
-      '<div class="text-center text-xs text-text-secondary pt-2"><strong>Copella Recorder 1.1</strong><br>© 2025 Copella</div>' +
-      '</div></div>';
+      '</div></div>' +
+      '</div>' +
+      '<div class="text-center text-xs text-text-secondary pt-2 mt-3"><strong>Copella Recorder 1.1</strong><br>© 2025 Copella</div>' +
+      '</div>';
     CopellaUI.openModal(CopellaDOM.settingsModal, content);
     CopellaDOM.settingsModal.querySelector('.close-btn').onclick = function(){ CopellaUI.closeModal(CopellaDOM.settingsModal); };
     CopellaDOM.settingsModal.querySelector('#exportBtn').onclick = exportStations;
     CopellaDOM.settingsModal.querySelector('#importFile').onchange = importStations;
+    
+    // Обработчики для вкладок
+    Array.prototype.forEach.call(CopellaDOM.settingsModal.querySelectorAll('.tab-btn'), function(btn){
+      btn.onclick = function(){
+        var tabName = this.dataset.tab;
+        // Обновляем активную вкладку
+        Array.prototype.forEach.call(CopellaDOM.settingsModal.querySelectorAll('.tab-btn'), function(otherBtn){
+          otherBtn.classList.remove('border-accent', 'text-accent');
+          otherBtn.classList.add('border-transparent', 'text-text-secondary');
+        });
+        this.classList.remove('border-transparent', 'text-text-secondary');
+        this.classList.add('border-accent', 'text-accent');
+        // Показываем соответствующий контент
+        Array.prototype.forEach.call(CopellaDOM.settingsModal.querySelectorAll('.tab-panel'), function(panel){
+          panel.classList.add('hidden');
+        });
+        document.getElementById(tabName + '-tab').classList.remove('hidden');
+      };
+    });
+    
     // Обработчики для кастомных радио-кнопок
     Array.prototype.forEach.call(CopellaDOM.settingsModal.querySelectorAll('[data-format]'), function(item){
       item.onclick = function(){
