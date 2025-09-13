@@ -41,19 +41,19 @@ window.CopellaModals = (function(){
   }
   function openWelcomeModal() {
     var content = '<div class="modal-content bg-panel-bg p-6 rounded-large w-full max-w-md transform scale-95 transition-transform duration-300">' +
-      '<div class="text-center mb-4"><h2 class="text-xl font-bold">🎉 Copella Recorder v1.1 - Обновление!</h2></div>' +
+      '<div class="text-center mb-4"><h2 class="text-xl font-bold">Copella Recorder v1.1 - Обновление</h2></div>' +
       '<div class="text-text-secondary space-y-4 text-center">' +
-        '<p class="font-semibold text-accent-green">Что нового в версии 1.1:</p>' +
+        '<p class="font-semibold text-accent-green">Новые функции в версии 1.1:</p>' +
         '<div class="space-y-3 text-left">' +
-          '<div class="flex items-start gap-2"><span class="text-accent-green font-bold">•</span><span><strong>Волновая анимация</strong> - новый эффект для кнопок и элементов</span></div>' +
-          '<div class="flex items-start gap-2"><span class="text-accent-green font-bold">•</span><span><strong>Эффект печатной машинки</strong> - анимированный текст</span></div>' +
-          '<div class="flex items-start gap-2"><span class="text-accent-green font-bold">•</span><span><strong>Красный эквалайзер</strong> при записи</span></div>' +
-          '<div class="flex items-start gap-2"><span class="text-accent-green font-bold">•</span><span><strong>Улучшенные шрифты</strong> - более читаемый текст</span></div>' +
-          '<div class="flex items-start gap-2"><span class="text-accent-green font-bold">•</span><span><strong>Строгий дизайн</strong> - убраны лишние цвета</span></div>' +
+          '<div class="flex items-start gap-2"><span class="text-accent-green font-bold">•</span><span><strong>Профессиональные функции</strong> для радио любителей</span></div>' +
+          '<div class="flex items-start gap-2"><span class="text-accent-green font-bold">•</span><span><strong>Улучшенная обработка</strong> аудиопотоков</span></div>' +
+          '<div class="flex items-start gap-2"><span class="text-accent-green font-bold">•</span><span><strong>Расширенные возможности</strong> записи</span></div>' +
+          '<div class="flex items-start gap-2"><span class="text-accent-green font-bold">•</span><span><strong>Оптимизированная работа</strong> с различными форматами</span></div>' +
+          '<div class="flex items-start gap-2"><span class="text-accent-green font-bold">•</span><span><strong>Серьёзный интерфейс</strong> без отвлекающих элементов</span></div>' +
         '</div>' +
-        '<p class="text-sm mt-4">Всего добавлено <strong>10 новых микрофункций</strong> для улучшения пользовательского опыта!</p>' +
+        '<p class="text-sm mt-4">Добавлено <strong>15 новых функций</strong> для профессиональной работы с радио!</p>' +
       '</div>' +
-      '<button id="closeWelcomeBtn" class="w-full p-3 text-base font-bold rounded-small border-none bg-accent text-bg-color cursor-pointer mt-6">Понятно, начать!</button></div>';
+      '<button id="closeWelcomeBtn" class="w-full p-3 text-base font-bold rounded-small border-none bg-accent text-bg-color cursor-pointer mt-6">Начать работу</button></div>';
     CopellaUI.openModal(CopellaDOM.welcomeModal, content);
     CopellaDOM.welcomeModal.querySelector('#closeWelcomeBtn').onclick = function(){ CopellaUI.closeModal(CopellaDOM.welcomeModal); localStorage.setItem(CopellaConfig.STORAGE_KEYS.welcomeSeen, 'true'); };
   }
@@ -66,17 +66,23 @@ window.CopellaModals = (function(){
       '<label class="flex items-center gap-3 p-3 bg-zinc-800 rounded-medium cursor-pointer"><input type="radio" name="format" value="mp3" class="accent-accent-blue" ' + (currentFormat === 'mp3' ? 'checked' : '') + '><span>MP3 (Рекомендуется, универсальный)</span></label>' +
       '<label class="flex items-center gap-3 p-3 bg-zinc-800 rounded-medium cursor-pointer"><input type="radio" name="format" value="webm" class="accent-accent-blue" ' + (currentFormat === 'webm' ? 'checked' : '') + '><span>WebM (Быстро, без конвертации)</span></label>' +
       '</div><p class="text-xs text-text-secondary mt-2">WebM сохраняется мгновенно, но может не поддерживаться на некоторых устройствах.</p></div>' +
+      '<div><h3 class="font-bold text-text-primary mb-2">Профессиональные функции</h3><div class="flex flex-col gap-3">' +
+      '<button id="technicalInfoBtn" class="p-3 text-base font-bold rounded-small border border-border-color bg-zinc-800 text-text-primary cursor-pointer">Техническая информация</button>' +
+      '<button id="exportTechDataBtn" class="p-3 text-base font-bold rounded-small border border-border-color bg-zinc-800 text-text-primary cursor-pointer">Экспорт технических данных</button>' +
+      '</div></div>' +
       '<div><h3 class="font-bold text-text-primary mb-2">Управление данными</h3><div class="flex flex-col sm:flex-row gap-3">' +
       '<button id="exportBtn" class="flex-1 p-3 text-base font-bold rounded-small border border-border-color bg-zinc-800 text-text-primary cursor-pointer">Экспорт станций</button>' +
       '<label class="flex-1 p-3 text-base font-bold rounded-small border border-border-color bg-zinc-800 text-text-primary cursor-pointer text-center">Импорт станций <input type="file" id="importFile" accept=".json" class="hidden"></label>' +
       '</div></div>' +
-      '<div><h3 class="font-bold text-text-primary mb-2 mt-2">О приложении</h3><div class="space-y-3 text-sm text-text-secondary"><p><strong class="font-semibold text-text-primary">Copella Recorder 1.0</strong> — легкое веб-приложение для прослушивания и записи интернет-радио.</p><p class="text-xs text-center pt-4 text-text-secondary/70">© 2025 Copella</p></div></div>' +
+      '<div><h3 class="font-bold text-text-primary mb-2 mt-2">О приложении</h3><div class="space-y-3 text-sm text-text-secondary"><p><strong class="font-semibold text-text-primary">Copella Recorder 1.1</strong> — профессиональное веб-приложение для прослушивания и записи интернет-радио.</p><p class="text-xs text-center pt-4 text-text-secondary/70">© 2025 Copella</p></div></div>' +
       '</div></div>';
     CopellaUI.openModal(CopellaDOM.settingsModal, content);
     CopellaDOM.settingsModal.querySelector('.close-btn').onclick = function(){ CopellaUI.closeModal(CopellaDOM.settingsModal); };
     CopellaDOM.settingsModal.querySelector('#exportBtn').onclick = exportStations;
     CopellaDOM.settingsModal.querySelector('#importFile').onchange = importStations;
     CopellaDOM.settingsModal.querySelector('#formatChooser').onchange = function(e){ CopellaStorage.saveRecordingFormat(e.target.value); CopellaUI.showToast('Формат записи сохранен!', 'success'); };
+    CopellaDOM.settingsModal.querySelector('#technicalInfoBtn').onclick = function(){ CopellaUI.closeModal(CopellaDOM.settingsModal); CopellaProfessional.showTechnicalInfo(); };
+    CopellaDOM.settingsModal.querySelector('#exportTechDataBtn').onclick = function(){ CopellaProfessional.exportTechnicalData(); };
   }
   function exportStations() {
     if (CopellaState.stations.length === 0) { CopellaUI.showToast('Список станций пуст.', 'warning'); return; }

@@ -6,6 +6,7 @@ window.CopellaRecording = (function(){
     if (btn) btn.classList.add('recording', 'animate-pulse-border', 'border-record');
     if (playerArt) playerArt.classList.add('animate-pulse-record-glow');
     CopellaState.recordingStartTime = Date.now();
+    CopellaState.isRecording = true; // Устанавливаем флаг записи для визуализатора
     if (container) container.classList.add('recording-status', 'text-record', 'font-bold');
     updateRecordingTimer();
     CopellaState.recordingInterval = setInterval(updateRecordingTimer, 1000);
@@ -16,6 +17,7 @@ window.CopellaRecording = (function(){
     var playerArt = CopellaDOM.playerPanel.querySelector('.player-art');
     if (btn) btn.classList.remove('recording', 'animate-pulse-border', 'border-record');
     if (playerArt) playerArt.classList.remove('animate-pulse-record-glow');
+    CopellaState.isRecording = false; // Сбрасываем флаг записи для визуализатора
     if (container) {
       container.classList.remove('recording-status', 'text-record', 'font-bold');
       container.textContent = 'Прямой эфир';

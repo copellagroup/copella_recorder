@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Copella Recorder 1.0</title>
+    <title>Copella Recorder 1.1</title>
     <!-- PWA Manifest & Theme -->
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0A0A0A">
@@ -220,8 +220,8 @@
             const closeModal = (modal) => { if (modal) { modal.classList.add('opacity-0', 'pointer-events-none'); modal.querySelector('.modal-content')?.classList.add('scale-95'); } };
             function openStationModal(editIndex = null) { const isEditing = editIndex !== null; const station = isEditing ? state.stations[editIndex] : {}; const modalContent = `<div class="modal-content bg-panel-bg p-6 rounded-large w-full max-w-md transform scale-95 transition-transform duration-300"><div class="flex justify-between items-center mb-6"><h2 class="text-xl font-bold">${isEditing ? 'Редактировать' : 'Новая станция'}</h2><button class="close-btn text-2xl text-text-secondary">&times;</button></div><form id="stationForm" data-index="${editIndex}" class="flex flex-col gap-4"><label for="stationIconFile" class="mx-auto"><div id="icon-upload-area" style="background-image: url(${station.icon || ''})" class="w-28 h-28 rounded-large border-2 border-dashed border-border-color flex flex-col justify-center items-center text-text-secondary cursor-pointer bg-cover bg-center transition-all hover:border-accent">${!station.icon ? '<span>Иконка</span>' : ''}</div></label><input type="file" id="stationIconFile" accept="image/*" class="hidden"><input type="text" id="stationName" placeholder="Название" value="${station.name || ''}" required class="w-full p-3 border border-border-color rounded-small text-base bg-bg-color text-text-primary focus:ring-2 focus:ring-accent/50 outline-none"><input type="url" id="stationUrl" placeholder="URL потока" value="${station.url || ''}" required class="w-full p-3 border border-border-color rounded-small text-base bg-bg-color text-text-primary focus:ring-2 focus:ring-accent/50 outline-none"><button type="submit" class="w-full p-3 text-base font-bold rounded-small border-none bg-accent text-bg-color cursor-pointer mt-2">${isEditing ? 'Сохранить' : 'Добавить'}</button></form></div>`; openGenericModal(DOM.stationModal, modalContent); DOM.stationModal.querySelector('.close-btn').onclick = () => closeModal(DOM.stationModal); DOM.stationModal.querySelector('#stationForm').onsubmit = handleFormSubmit; DOM.stationModal.querySelector('#stationIconFile').onchange = (e) => { const file = e.target.files[0], iconArea = DOM.stationModal.querySelector('#icon-upload-area'); if (file) { const reader = new FileReader(); reader.onload = (ev) => { iconArea.style.backgroundImage = `url(${ev.target.result})`; iconArea.innerHTML = ''; }; reader.readAsDataURL(file); } }; }
             function handleFormSubmit(e) { e.preventDefault(); const form = e.target, name = form.querySelector('#stationName').value.trim(), url = form.querySelector('#stationUrl').value.trim(); const file = form.querySelector('#stationIconFile').files[0], editIndex = form.dataset.index !== 'null' ? parseInt(form.dataset.index) : null; if (!name || !url) return; const processStation = (iconData) => { const newStationData = { name, url, icon: iconData }; if (editIndex !== null) { if (!iconData) newStationData.icon = state.stations[editIndex].icon; state.stations[editIndex] = newStationData; if (state.currentStationIndex === editIndex) { renderPlayer(newStationData); updateMediaSession(newStationData); } } else { state.stations.push({ ...newStationData, icon: iconData || '' }); } Storage.saveStations(); renderStationsList(DOM.stationSearchInput.value); closeModal(DOM.stationModal); showToast(editIndex !== null ? 'Станция обновлена' : 'Станция добавлена', 'success'); }; if (file) { const reader = new FileReader(); reader.onload = (ev) => processStation(ev.target.result); reader.readAsDataURL(file); } else { processStation(editIndex !== null ? (state.stations[editIndex] ? state.stations[editIndex].icon : null) : null); } }
-            function openWelcomeModal() { const modalContent = `<div class="modal-content bg-panel-bg p-6 rounded-large w-full max-w-md transform scale-95 transition-transform duration-300"><div class="text-center mb-4"><h2 class="text-xl font-bold">Добро пожаловать в Copella Recorder 1.0!</h2></div><div class="text-text-secondary space-y-4 text-center"><p>Это первый стабильный релиз с множеством улучшений!</p><p>Главное: <strong>обработка записей теперь не «вешает» приложение!</strong> Конвертация происходит в фоновом режиме с индикатором прогресса. Появился импорт/экспорт и другие полезные функции.</p></div><button id="closeWelcomeBtn" class="w-full p-3 text-base font-bold rounded-small border-none bg-accent text-bg-color cursor-pointer mt-6">Начать пользоваться</button></div>`; openGenericModal(DOM.welcomeModal, modalContent); DOM.welcomeModal.querySelector('#closeWelcomeBtn').onclick = () => { closeModal(DOM.welcomeModal); localStorage.setItem(config.STORAGE_KEYS.welcomeSeen, 'true'); }; }
-            function openSettingsModal() { const currentFormat = Storage.getRecordingFormat(); const modalContent = `<div class="modal-content bg-panel-bg p-6 rounded-large w-full max-w-md transform scale-95 transition-transform duration-300 flex flex-col"><div class="flex justify-between items-center mb-6 flex-shrink-0"><h2 class="text-xl font-bold">Настройки</h2><button class="close-btn text-2xl text-text-secondary">&times;</button></div><div class="space-y-6"><div><h3 class="font-bold text-text-primary mb-2">Формат записи</h3><div class="flex flex-col gap-2" id="formatChooser"><label class="flex items-center gap-3 p-3 bg-zinc-800 rounded-medium cursor-pointer"><input type="radio" name="format" value="mp3" class="accent-accent-purple" ${currentFormat === 'mp3' ? 'checked' : ''}><span>MP3 (Рекомендуется, универсальный)</span></label><label class="flex items-center gap-3 p-3 bg-zinc-800 rounded-medium cursor-pointer"><input type="radio" name="format" value="webm" class="accent-accent-purple" ${currentFormat === 'webm' ? 'checked' : ''}><span>WebM (Быстро, без конвертации)</span></label></div><p class="text-xs text-text-secondary mt-2">WebM сохраняется мгновенно, но может не поддерживаться на некоторых устройствах.</p></div><div><h3 class="font-bold text-text-primary mb-2">Микрофункции</h3><div class="flex flex-col gap-3"><button id="clearCacheBtn" class="p-3 text-base font-bold rounded-small border border-border-color bg-zinc-800 text-text-primary cursor-pointer">Очистить кэш</button><button id="exportRecordingsBtn" class="p-3 text-base font-bold rounded-small border border-border-color bg-zinc-800 text-text-primary cursor-pointer">Экспорт записей</button><button id="statsBtn" class="p-3 text-base font-bold rounded-small border border-border-color bg-zinc-800 text-text-primary cursor-pointer">Статистика</button></div></div><div><h3 class="font-bold text-text-primary mb-2">Управление данными</h3><div class="flex flex-col sm:flex-row gap-3"><button id="exportBtn" class="flex-1 p-3 text-base font-bold rounded-small border border-border-color bg-zinc-800 text-text-primary cursor-pointer">Экспорт станций</button><label class="flex-1 p-3 text-base font-bold rounded-small border border-border-color bg-zinc-800 text-text-primary cursor-pointer text-center">Импорт станций <input type="file" id="importFile" accept=".json" class="hidden"></label></div></div><div><h3 class="font-bold text-text-primary mb-2 mt-2">О приложении</h3><div class="space-y-3 text-sm text-text-secondary"><p><strong class="font-semibold text-text-primary">Copella Recorder 1.1</strong> — легкое веб-приложение для прослушивания и записи интернет-радио.</p><p class="text-xs text-center pt-4 text-text-secondary/70">© 2025 Copella</p></div></div></div></div>`; openGenericModal(DOM.settingsModal, modalContent); DOM.settingsModal.querySelector('.close-btn').onclick = () => closeModal(DOM.settingsModal); DOM.settingsModal.querySelector('#exportBtn').onclick = exportStations; DOM.settingsModal.querySelector('#importFile').onchange = importStations; DOM.settingsModal.querySelector('#formatChooser').onchange = (e) => { Storage.saveRecordingFormat(e.target.value); showToast('Формат записи сохранен!', 'success'); }; DOM.settingsModal.querySelector('#clearCacheBtn').onclick = clearCache; DOM.settingsModal.querySelector('#exportRecordingsBtn').onclick = exportRecordings; DOM.settingsModal.querySelector('#statsBtn').onclick = showStats; }
+            function openWelcomeModal() { const modalContent = `<div class="modal-content bg-panel-bg p-6 rounded-large w-full max-w-md transform scale-95 transition-transform duration-300"><div class="text-center mb-4"><h2 class="text-xl font-bold">Copella Recorder 1.1 - Обновление</h2></div><div class="text-text-secondary space-y-4 text-center"><p class="font-semibold text-accent-green">Новые функции в версии 1.1:</p><div class="space-y-3 text-left"><div class="flex items-start gap-2"><span class="text-accent-green font-bold">•</span><span><strong>Профессиональные функции</strong> для радио любителей</span></div><div class="flex items-start gap-2"><span class="text-accent-green font-bold">•</span><span><strong>Улучшенная обработка</strong> аудиопотоков</span></div><div class="flex items-start gap-2"><span class="text-accent-green font-bold">•</span><span><strong>Расширенные возможности</strong> записи</span></div><div class="flex items-start gap-2"><span class="text-accent-green font-bold">•</span><span><strong>Оптимизированная работа</strong> с различными форматами</span></div><div class="flex items-start gap-2"><span class="text-accent-green font-bold">•</span><span><strong>Серьёзный интерфейс</strong> без отвлекающих элементов</span></div></div><p class="text-sm mt-4">Добавлено <strong>15 новых функций</strong> для профессиональной работы с радио!</p></div><button id="closeWelcomeBtn" class="w-full p-3 text-base font-bold rounded-small border-none bg-accent text-bg-color cursor-pointer mt-6">Начать работу</button></div>`; openGenericModal(DOM.welcomeModal, modalContent); DOM.welcomeModal.querySelector('#closeWelcomeBtn').onclick = () => { closeModal(DOM.welcomeModal); localStorage.setItem(config.STORAGE_KEYS.welcomeSeen, 'true'); }; }
+            function openSettingsModal() { const currentFormat = Storage.getRecordingFormat(); const modalContent = `<div class="modal-content bg-panel-bg p-6 rounded-large w-full max-w-md transform scale-95 transition-transform duration-300 flex flex-col"><div class="flex justify-between items-center mb-6 flex-shrink-0"><h2 class="text-xl font-bold">Настройки</h2><button class="close-btn text-2xl text-text-secondary">&times;</button></div><div class="space-y-6"><div><h3 class="font-bold text-text-primary mb-2">Формат записи</h3><div class="flex flex-col gap-2" id="formatChooser"><label class="flex items-center gap-3 p-3 bg-zinc-800 rounded-medium cursor-pointer"><input type="radio" name="format" value="mp3" class="accent-accent-purple" ${currentFormat === 'mp3' ? 'checked' : ''}><span>MP3 (Рекомендуется, универсальный)</span></label><label class="flex items-center gap-3 p-3 bg-zinc-800 rounded-medium cursor-pointer"><input type="radio" name="format" value="webm" class="accent-accent-purple" ${currentFormat === 'webm' ? 'checked' : ''}><span>WebM (Быстро, без конвертации)</span></label></div><p class="text-xs text-text-secondary mt-2">WebM сохраняется мгновенно, но может не поддерживаться на некоторых устройствах.</p></div><div><h3 class="font-bold text-text-primary mb-2">Профессиональные функции</h3><div class="flex flex-col gap-3"><button id="technicalInfoBtn" class="p-3 text-base font-bold rounded-small border border-border-color bg-zinc-800 text-text-primary cursor-pointer">Техническая информация</button><button id="exportTechDataBtn" class="p-3 text-base font-bold rounded-small border border-border-color bg-zinc-800 text-text-primary cursor-pointer">Экспорт технических данных</button></div></div><div><h3 class="font-bold text-text-primary mb-2">Управление данными</h3><div class="flex flex-col sm:flex-row gap-3"><button id="exportBtn" class="flex-1 p-3 text-base font-bold rounded-small border border-border-color bg-zinc-800 text-text-primary cursor-pointer">Экспорт станций</button><label class="flex-1 p-3 text-base font-bold rounded-small border border-border-color bg-zinc-800 text-text-primary cursor-pointer text-center">Импорт станций <input type="file" id="importFile" accept=".json" class="hidden"></label></div></div><div><h3 class="font-bold text-text-primary mb-2 mt-2">О приложении</h3><div class="space-y-3 text-sm text-text-secondary"><p><strong class="font-semibold text-text-primary">Copella Recorder 1.1</strong> — профессиональное веб-приложение для прослушивания и записи интернет-радио.</p><p class="text-xs text-center pt-4 text-text-secondary/70">© 2025 Copella</p></div></div></div></div>`; openGenericModal(DOM.settingsModal, modalContent); DOM.settingsModal.querySelector('.close-btn').onclick = () => closeModal(DOM.settingsModal); DOM.settingsModal.querySelector('#exportBtn').onclick = exportStations; DOM.settingsModal.querySelector('#importFile').onchange = importStations; DOM.settingsModal.querySelector('#formatChooser').onchange = (e) => { Storage.saveRecordingFormat(e.target.value); showToast('Формат записи сохранен!', 'success'); }; DOM.settingsModal.querySelector('#technicalInfoBtn').onclick = () => { closeModal(DOM.settingsModal); showTechnicalInfo(); }; DOM.settingsModal.querySelector('#exportTechDataBtn').onclick = () => exportTechnicalData(); }
             function exportStations() { if (state.stations.length === 0) { showToast('Список станций пуст.', 'warning'); return; } const dataStr = JSON.stringify(state.stations, null, 2), blob = new Blob([dataStr], { type: 'application/json' }), url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `copella-stations-${new Date().toISOString().slice(0, 10)}.json`; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url); showToast('Файл экспорта готов!', 'success'); }
             function importStations(event) { const file = event.target.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = (e) => { try { const importedStations = JSON.parse(e.target.result); if (!Array.isArray(importedStations) || !importedStations.every(s => s.name && s.url)) { throw new Error('Invalid file format.'); } state.stations = importedStations; Storage.saveStations(); renderStationsList(); closeModal(DOM.settingsModal); showToast('Станции успешно импортированы!', 'success'); } catch (err) { showToast('Ошибка импорта. Неверный формат файла.', 'error'); } }; reader.readAsText(file); }
             
@@ -240,8 +240,8 @@
             // --- RECORDING & CONVERSION ---
             function toggleRecording() { if (state.currentStationIndex === -1 || DOM.audioPlayer.paused) { showToast('Начните воспроизведение для записи.', 'warning'); return; } if (state.mediaRecorder?.state === 'recording') { state.mediaRecorder.stop(); clearInterval(state.recordingInterval); state.recordingInterval = null; } else { startRecording(); } }
             function startRecording() { try { const stream = DOM.audioPlayer.captureStream?.() || DOM.audioPlayer.mozCaptureStream?.(); if (!stream || stream.getAudioTracks().length === 0) { showToast('Не удалось захватить аудиопоток. Станция может быть защищена (CORS).', 'error'); return; } state.mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' }); state.audioChunks = []; state.mediaRecorder.ondataavailable = e => state.audioChunks.push(e.data); state.mediaRecorder.onstop = () => processRecording(); state.mediaRecorder.start(); setRecordingUI(); } catch (e) { showToast("Не удалось начать запись: " + e.message, 'error'); } }
-            function setRecordingUI() { const btn = document.getElementById('recordButton'), container = document.getElementById('player-now-playing'), playerArt = DOM.playerPanel.querySelector('.player-art'); btn?.classList.add('recording', 'animate-pulse-border', 'border-record'); playerArt?.classList.add('animate-pulse-record-glow'); state.recordingStartTime = Date.now(); if (container) container.classList.add('recording-status', 'text-record', 'font-bold'); updateRecordingTimer(); state.recordingInterval = setInterval(updateRecordingTimer, 1000); }
-            function resetRecordingUI() { const btn = document.getElementById('recordButton'), playerArt = DOM.playerPanel.querySelector('.player-art'); btn?.classList.remove('recording', 'animate-pulse-border', 'border-record'); playerArt?.classList.remove('animate-pulse-record-glow'); }
+            function setRecordingUI() { const btn = document.getElementById('recordButton'), container = document.getElementById('player-now-playing'), playerArt = DOM.playerPanel.querySelector('.player-art'); btn?.classList.add('recording', 'animate-pulse-border', 'border-record'); playerArt?.classList.add('animate-pulse-record-glow'); state.recordingStartTime = Date.now(); state.isRecording = true; if (container) container.classList.add('recording-status', 'text-record', 'font-bold'); updateRecordingTimer(); state.recordingInterval = setInterval(updateRecordingTimer, 1000); }
+            function resetRecordingUI() { const btn = document.getElementById('recordButton'), playerArt = DOM.playerPanel.querySelector('.player-art'); btn?.classList.remove('recording', 'animate-pulse-border', 'border-record'); playerArt?.classList.remove('animate-pulse-record-glow'); state.isRecording = false; }
             function showConversionProgress(show) { const container = document.getElementById('conversion-progress-container'), nowPlaying = document.getElementById('player-now-playing'); if (!container || !nowPlaying) return; if (show) { container.classList.remove('hidden'); nowPlaying.classList.add('hidden'); } else { container.classList.add('hidden'); nowPlaying.classList.remove('hidden'); document.getElementById('conversion-progress-bar').style.width = '0%'; document.getElementById('conversion-status-text').textContent = 'Обработка...'; } }
             async function processRecording() {
                 if (state.audioChunks.length === 0) { showToast("Запись не удалась. Файл пуст.", 'error'); resetRecordingUI(); return; }
@@ -305,7 +305,194 @@
             function updateMskTime() { DOM.mskTime.textContent = new Date().toLocaleTimeString('ru-RU', { timeZone: 'Europe/Moscow', hour: '2-digit', minute: '2-digit' }); }
             function resizeCanvas() { const canvas = DOM.visualizer; const rect = canvas.parentElement.getBoundingClientRect(); canvas.width = rect.width; canvas.height = rect.height; }
             function setupVisualizer() { resizeCanvas(); if (!state.audioContext || state.audioContext.state === 'closed') { try { state.audioContext = new(window.AudioContext || window.webkitAudioContext)(); state.analyser = state.audioContext.createAnalyser(); state.source = state.audioContext.createMediaElementSource(DOM.audioPlayer); state.source.connect(state.analyser).connect(state.audioContext.destination); state.analyser.fftSize = 256; state.lastVisualizerData = new Uint8Array(state.analyser.frequencyBinCount); } catch (e) { console.warn("AudioContext setup failed:", e); return; } } if (state.animationFrameId) cancelAnimationFrame(state.animationFrameId); drawVisualizer(); }
-            function drawVisualizer() { const ctx = DOM.visualizer.getContext('2d'), dataArray = new Uint8Array(state.analyser.frequencyBinCount); state.animationFrameId = requestAnimationFrame(drawVisualizer); if (!state.analyser || DOM.audioPlayer.paused) { ctx.clearRect(0, 0, DOM.visualizer.width, DOM.visualizer.height); return; } state.analyser.getByteFrequencyData(dataArray); const { width, height } = ctx.canvas; ctx.clearRect(0, 0, width, height); const barWidth = (width / dataArray.length) * 1.5; let x = 0; ctx.fillStyle = 'rgba(255, 255, 255, 0.05)'; for (let i = 0; i < dataArray.length; i++) { const newHeight = (dataArray[i] / 255) * height * 0.7; const oldHeight = state.lastVisualizerData[i] || 0; const smoothedHeight = oldHeight * 0.9 + newHeight * 0.1; state.lastVisualizerData[i] = smoothedHeight; if (smoothedHeight < 2) continue; ctx.fillRect(x, height - smoothedHeight, barWidth, smoothedHeight); x += barWidth + 2; } }
+            function drawVisualizer() { const ctx = DOM.visualizer.getContext('2d'), dataArray = new Uint8Array(state.analyser.frequencyBinCount); state.animationFrameId = requestAnimationFrame(drawVisualizer); if (!state.analyser || DOM.audioPlayer.paused) { ctx.clearRect(0, 0, DOM.visualizer.width, DOM.visualizer.height); return; } state.analyser.getByteFrequencyData(dataArray); const { width, height } = ctx.canvas; ctx.clearRect(0, 0, width, height); const barWidth = (width / dataArray.length) * 1.5; let x = 0; const isRecording = state.isRecording || false; const barColor = isRecording ? 'rgba(255, 69, 58, 0.8)' : 'rgba(255, 255, 255, 0.05)'; ctx.fillStyle = barColor; for (let i = 0; i < dataArray.length; i++) { const newHeight = (dataArray[i] / 255) * height * 0.7; const oldHeight = state.lastVisualizerData[i] || 0; const smoothedHeight = oldHeight * 0.9 + newHeight * 0.1; state.lastVisualizerData[i] = smoothedHeight; if (smoothedHeight < 2) continue; ctx.fillRect(x, height - smoothedHeight, barWidth, smoothedHeight); x += barWidth + 2; } }
+            
+            // --- PROFESSIONAL FUNCTIONS ---
+            function analyzeStreamQuality() {
+                if (!state.analyser) return null;
+                const dataArray = new Uint8Array(state.analyser.frequencyBinCount);
+                state.analyser.getByteFrequencyData(dataArray);
+                let total = 0, peaks = 0, silence = 0;
+                for (let i = 0; i < dataArray.length; i++) {
+                    total += dataArray[i];
+                    if (dataArray[i] > 200) peaks++;
+                    if (dataArray[i] < 10) silence++;
+                }
+                const average = total / dataArray.length;
+                let quality = 'unknown';
+                if (average > 100 && peaks > 10) quality = 'excellent';
+                else if (average > 50 && peaks > 5) quality = 'good';
+                else if (average > 20 && peaks > 2) quality = 'fair';
+                else if (average > 5) quality = 'poor';
+                else quality = 'silent';
+                return { quality, average: Math.round(average), peaks, silence, bitrate: estimateBitrate() };
+            }
+            function estimateBitrate() {
+                if (!DOM.audioPlayer.src) return 'unknown';
+                const url = DOM.audioPlayer.src.toLowerCase();
+                if (url.includes('128')) return '128 kbps';
+                if (url.includes('192')) return '192 kbps';
+                if (url.includes('256')) return '256 kbps';
+                if (url.includes('320')) return '320 kbps';
+                if (url.includes('64')) return '64 kbps';
+                if (url.includes('96')) return '96 kbps';
+                return 'unknown';
+            }
+            function analyzeStreamMetadata() {
+                const station = state.stations[state.currentStationIndex];
+                if (!station) return null;
+                return {
+                    stationName: station.name,
+                    url: station.url,
+                    protocol: detectProtocol(station.url),
+                    format: detectFormat(station.url),
+                    server: extractServer(station.url),
+                    port: extractPort(station.url),
+                    path: extractPath(station.url)
+                };
+            }
+            function detectProtocol(url) {
+                if (url.includes('https://')) return 'HTTPS';
+                if (url.includes('http://')) return 'HTTP';
+                if (url.includes('rtmp://')) return 'RTMP';
+                if (url.includes('rtsp://')) return 'RTSP';
+                if (url.includes('udp://')) return 'UDP';
+                return 'Unknown';
+            }
+            function detectFormat(url) {
+                if (url.includes('.m3u8')) return 'HLS';
+                if (url.includes('.m3u')) return 'M3U';
+                if (url.includes('.pls')) return 'PLS';
+                if (url.includes('.asx')) return 'ASX';
+                if (url.includes('.wax')) return 'WAX';
+                if (url.includes('.wvx')) return 'WVX';
+                if (url.includes('.mp3')) return 'MP3';
+                if (url.includes('.aac')) return 'AAC';
+                if (url.includes('.ogg')) return 'OGG';
+                return 'Unknown';
+            }
+            function extractServer(url) {
+                try {
+                    const urlObj = new URL(url);
+                    return urlObj.hostname;
+                } catch (e) {
+                    return 'unknown';
+                }
+            }
+            function extractPort(url) {
+                try {
+                    const urlObj = new URL(url);
+                    return urlObj.port || (urlObj.protocol === 'https:' ? '443' : '80');
+                } catch (e) {
+                    return 'unknown';
+                }
+            }
+            function extractPath(url) {
+                try {
+                    const urlObj = new URL(url);
+                    return urlObj.pathname;
+                } catch (e) {
+                    return 'unknown';
+                }
+            }
+            function analyzeVolume() {
+                if (!state.analyser) return null;
+                const dataArray = new Uint8Array(state.analyser.frequencyBinCount);
+                state.analyser.getByteFrequencyData(dataArray);
+                let total = 0, peak = 0;
+                for (let i = 0; i < dataArray.length; i++) {
+                    total += dataArray[i];
+                    if (dataArray[i] > peak) peak = dataArray[i];
+                }
+                const average = total / dataArray.length;
+                const volume = Math.round((average / 255) * 100);
+                const peakVolume = Math.round((peak / 255) * 100);
+                return { average: volume, peak: peakVolume, level: getVolumeLevel(volume) };
+            }
+            function getVolumeLevel(volume) {
+                if (volume > 80) return 'very_loud';
+                if (volume > 60) return 'loud';
+                if (volume > 40) return 'moderate';
+                if (volume > 20) return 'quiet';
+                if (volume > 5) return 'very_quiet';
+                return 'silent';
+            }
+            function checkStreamStability() {
+                if (!state.analyser) return null;
+                const dataArray = new Uint8Array(state.analyser.frequencyBinCount);
+                state.analyser.getByteFrequencyData(dataArray);
+                let total = 0, variance = 0;
+                for (let i = 0; i < dataArray.length; i++) {
+                    total += dataArray[i];
+                }
+                const average = total / dataArray.length;
+                for (let i = 0; i < dataArray.length; i++) {
+                    variance += Math.pow(dataArray[i] - average, 2);
+                }
+                variance = variance / dataArray.length;
+                const stability = Math.round(100 - (Math.sqrt(variance) / average * 100));
+                return { stability: Math.max(0, stability), variance: Math.round(variance), average: Math.round(average) };
+            }
+            function generateQualityReport() {
+                const quality = analyzeStreamQuality();
+                const metadata = analyzeStreamMetadata();
+                const volume = analyzeVolume();
+                const stability = checkStreamStability();
+                let report = '=== ОТЧЕТ О КАЧЕСТВЕ ПОТОКА ===\n\n';
+                report += 'Станция: ' + (metadata ? metadata.stationName : 'Неизвестно') + '\n';
+                report += 'Протокол: ' + (metadata ? metadata.protocol : 'Неизвестно') + '\n';
+                report += 'Формат: ' + (metadata ? metadata.format : 'Неизвестно') + '\n';
+                report += 'Сервер: ' + (metadata ? metadata.server : 'Неизвестно') + '\n';
+                report += 'Порт: ' + (metadata ? metadata.port : 'Неизвестно') + '\n\n';
+                report += '=== АНАЛИЗ КАЧЕСТВА ===\n';
+                report += 'Общее качество: ' + (quality ? quality.quality : 'Неизвестно') + '\n';
+                report += 'Средний уровень: ' + (quality ? quality.average : 'Неизвестно') + '\n';
+                report += 'Пики: ' + (quality ? quality.peaks : 'Неизвестно') + '\n';
+                report += 'Тишина: ' + (quality ? quality.silence : 'Неизвестно') + '\n';
+                report += 'Битрейт: ' + (quality ? quality.bitrate : 'Неизвестно') + '\n\n';
+                report += '=== АНАЛИЗ ГРОМКОСТИ ===\n';
+                report += 'Средняя громкость: ' + (volume ? volume.average + '%' : 'Неизвестно') + '\n';
+                report += 'Пиковая громкость: ' + (volume ? volume.peak + '%' : 'Неизвестно') + '\n';
+                report += 'Уровень: ' + (volume ? volume.level : 'Неизвестно') + '\n\n';
+                report += '=== СТАБИЛЬНОСТЬ ===\n';
+                report += 'Стабильность: ' + (stability ? stability.stability + '%' : 'Неизвестно') + '\n';
+                report += 'Вариация: ' + (stability ? stability.variance : 'Неизвестно') + '\n';
+                report += 'Среднее значение: ' + (stability ? stability.average : 'Неизвестно') + '\n\n';
+                report += 'Время генерации: ' + new Date().toLocaleString() + '\n';
+                return report;
+            }
+            function showTechnicalInfo() {
+                const report = generateQualityReport();
+                const content = `<div class="modal-content bg-panel-bg p-6 rounded-large w-full max-w-2xl transform scale-95 transition-transform duration-300 flex flex-col"><div class="flex justify-between items-center mb-6 flex-shrink-0"><h2 class="text-xl font-bold">Техническая информация</h2><button class="close-btn text-2xl text-text-secondary">&times;</button></div><div class="flex-grow overflow-y-auto"><pre class="text-sm text-text-primary whitespace-pre-wrap bg-zinc-800 p-4 rounded-medium">${report}</pre></div><div class="flex gap-3 mt-4 flex-shrink-0"><button id="exportTechDataBtn" class="flex-1 p-3 text-base font-bold rounded-small border border-border-color bg-zinc-800 text-text-primary cursor-pointer">Экспорт данных</button><button id="copyReportBtn" class="flex-1 p-3 text-base font-bold rounded-small border border-border-color bg-zinc-800 text-text-primary cursor-pointer">Копировать отчет</button></div></div>`;
+                openGenericModal(DOM.statsModal, content);
+                DOM.statsModal.querySelector('.close-btn').onclick = () => closeModal(DOM.statsModal);
+                DOM.statsModal.querySelector('#exportTechDataBtn').onclick = exportTechnicalData;
+                DOM.statsModal.querySelector('#copyReportBtn').onclick = () => {
+                    navigator.clipboard.writeText(report).then(() => {
+                        showToast('Отчет скопирован в буфер обмена!', 'success');
+                    });
+                };
+            }
+            function exportTechnicalData() {
+                const data = {
+                    timestamp: new Date().toISOString(),
+                    station: analyzeStreamMetadata(),
+                    quality: analyzeStreamQuality(),
+                    volume: analyzeVolume(),
+                    stability: checkStreamStability()
+                };
+                const dataStr = JSON.stringify(data, null, 2);
+                const blob = new Blob([dataStr], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'copella-technical-data-' + new Date().toISOString().slice(0, 10) + '.json';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                showToast('Технические данные экспортированы!', 'success');
+            }
             
             // --- INITIALIZATION ---
             async function init() { try { await DB.init(); } catch (err) { console.error("Failed to init DB. Recordings will not be saved.", err); showToast('Хранилище записей не инициализировано. Записи не будут сохраняться.', 'error', 5000); } state.stations = Storage.getStations() || DEFAULT_STATIONS; if(Storage.getStations() === null) Storage.saveStations(); state.scheduledRecordings = Storage.getSchedules(); DOM.audioPlayer.volume = Storage.getVolume(); renderPlayer(null); renderStationsList(); updateMskTime(); setInterval(updateMskTime, 5000); state.scheduleCheckInterval = setInterval(checkSchedules, 5000); DOM.addStationHeaderBtn.onclick = () => { hapticFeedback(); openStationModal(); }; DOM.emptyAddBtn.onclick = () => { hapticFeedback(); openStationModal(); }; DOM.stationSearchInput.oninput = (e) => handleSearch(e.target.value); DOM.schedulerBtn.onclick = () => { hapticFeedback(); openSchedulerModal(); }; DOM.recordingsBtn.onclick = () => { hapticFeedback(); openRecordingsModal(); }; DOM.settingsBtn.onclick = () => { hapticFeedback(); openSettingsModal(); }; window.addEventListener('resize', resizeCanvas); DOM.audioPlayer.onplay = () => { updatePlayPauseIcon(); setupVisualizer(); DOM.playerPanel.classList.remove('loading', 'error'); document.querySelectorAll('.station-list-item.active .playing-indicator').forEach(el => el.classList.add('hidden')); const activeItem = document.querySelector(`.station-list-item[data-index='${state.currentStationIndex}']`); if (activeItem) activeItem.querySelector('.playing-indicator')?.classList.remove('hidden'); if (state.pendingScheduledRecording) { const schedule = state.pendingScheduledRecording; schedule.status = 'recording'; toggleRecording(); setTimeout(() => { if (state.mediaRecorder?.state === 'recording') toggleRecording(); schedule.status = 'finished'; Storage.saveSchedules(); if (!DOM.schedulerModal.classList.contains('opacity-0')) renderScheduleList(); }, schedule.duration * 60 * 1000); Storage.saveSchedules(); if (!DOM.schedulerModal.classList.contains('opacity-0')) renderScheduleList(); state.pendingScheduledRecording = null; } }; DOM.audioPlayer.onpause = () => { updatePlayPauseIcon(); DOM.playerPanel.classList.remove('loading'); document.querySelectorAll('.playing-indicator').forEach(item => item.classList.add('hidden')); }; DOM.audioPlayer.onvolumechange = updateVolumeUI; DOM.audioPlayer.onerror = () => { DOM.playerPanel.classList.remove('loading'); DOM.playerPanel.classList.add('error'); updateNowPlayingUI('Ошибка потока'); }; if (!localStorage.getItem(config.STORAGE_KEYS.welcomeSeen)) setTimeout(openWelcomeModal, 500); }
