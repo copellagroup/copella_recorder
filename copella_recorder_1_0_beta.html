@@ -118,7 +118,17 @@
             
             // --- WORKER SCRIPT ---
             const WORKER_SCRIPT_STRING = `
-                self.importScripts('https://cdn.jsdelivr.net/npm/lamejs@1.2.1/lame.min.js');
+                try {
+                    self.importScripts('https://cdn.jsdelivr.net/npm/lamejs@1.2.1/lame.min.js');
+                } catch (error) {
+                    self.postMessage({ type: 'error', message: 'Не удалось загрузить lamejs: ' + error.message });
+                    return;
+                }
+
+                if (typeof lamejs === 'undefined') {
+                    self.postMessage({ type: 'error', message: 'lamejs не загружен' });
+                    return;
+                }
 
                 self.onmessage = (event) => {
                     const { channels, sampleRate } = event.data;
@@ -279,7 +289,15 @@
                             showConversionProgress(false); state.converterWorker.terminate(); state.converterWorker = null;
                         } else if (type === 'error') { throw new Error(message); }
                     };
-                    state.converterWorker.onerror = (err) => { throw new Error(`Критическая ошибка воркера: ${err.message}`); };
+                    state.converterWorker.onerror = (err) => { 
+                        console.error('Worker error:', err);
+                        showToast('Ошибка конвертации: ' + (err.message || 'Неизвестная ошибка'), 'error');
+                        showConversionProgress(false);
+                        if (state.converterWorker) {
+                            state.converterWorker.terminate();
+                            state.converterWorker = null;
+                        }
+                    };
                     state.converterWorker.postMessage({ channels: channelsData, sampleRate: audioBuffer.sampleRate }, transferable);
                 } catch(error) {
                     console.error('Ошибка обработки записи:', error); showToast(`Не удалось сконвертировать запись: ${error.message}`, 'error', 5000); showConversionProgress(false);

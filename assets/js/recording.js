@@ -97,9 +97,17 @@ window.CopellaRecording = (function(){
         for (var i = 0; i < audioBuffer.numberOfChannels; i++) { var channel = audioBuffer.getChannelData(i); channelsData.push(channel); transferable.push(channel.buffer); }
         if (durationInSeconds > 60 * 10) { CopellaUI.showToast('Началась обработка длинной записи. Это может занять несколько минут.', 'info', 5000); }
         if (CopellaState.converterWorker) CopellaState.converterWorker.terminate();
-        CopellaState.converterWorker = new Worker((window.CopellaRuntime ? CopellaRuntime.pluginUrl : '') + 'assets/js/workers/mp3-encoder.js');
+        CopellaState.converterWorker = new Worker((window.CopellaRuntime ? CopellaRuntime.pluginUrl : '') + 'assets/js/mp3-encoder.js');
         CopellaState.converterWorker.onmessage = function(event){ var type = event.data.type, progress = event.data.progress, mp3Blob = event.data.mp3Blob, message = event.data.message; if (type === 'progress') { document.getElementById('conversion-progress-bar').style.width = progress + '%'; document.getElementById('conversion-status-text').textContent = 'Кодирование... ' + progress + '%'; } else if (type === 'complete') { var rec = { id: Date.now(), stationName: station.name, stationIcon: station.icon, date: new Date().toISOString(), duration: durationInSeconds, blob: mp3Blob }; CopellaDB.saveRecording(rec).then(function(){ CopellaState.hasNewRecordings = true; updateNewRecordingBadge(); CopellaUI.showToast('Запись MP3 сохранена!', 'success'); showConversionProgress(false); CopellaState.converterWorker.terminate(); CopellaState.converterWorker = null; }); } else if (type === 'error') { throw new Error(message); } };
-        CopellaState.converterWorker.onerror = function(err){ CopellaUI.showToast('Критическая ошибка воркера: ' + err.message, 'error'); };
+        CopellaState.converterWorker.onerror = function(err){ 
+          console.error('Worker error:', err);
+          CopellaUI.showToast('Ошибка конвертации: ' + (err.message || 'Неизвестная ошибка'), 'error'); 
+          showConversionProgress(false);
+          if (CopellaState.converterWorker) {
+            CopellaState.converterWorker.terminate();
+            CopellaState.converterWorker = null;
+          }
+        };
         CopellaState.converterWorker.postMessage({ channels: channelsData, sampleRate: audioBuffer.sampleRate }, transferable);
       }).catch(function(error){ console.error(error); CopellaUI.showToast('Не удалось декодировать запись: ' + error.message, 'error', 5000); showConversionProgress(false); });
     }).catch(function(error){ CopellaUI.showToast('Ошибка чтения записи: ' + error.message, 'error'); showConversionProgress(false); });

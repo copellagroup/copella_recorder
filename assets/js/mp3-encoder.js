@@ -1,5 +1,15 @@
 /* global self */
-importScripts('https://cdn.jsdelivr.net/npm/lamejs@1.2.1/lame.min.js');
+try {
+  importScripts('https://cdn.jsdelivr.net/npm/lamejs@1.2.1/lame.min.js');
+} catch (error) {
+  self.postMessage({ type: 'error', message: 'Не удалось загрузить lamejs: ' + error.message });
+  return;
+}
+
+if (typeof lamejs === 'undefined') {
+  self.postMessage({ type: 'error', message: 'lamejs не загружен' });
+  return;
+}
 
 self.onmessage = function(event){
   var channels = event.data.channels;
