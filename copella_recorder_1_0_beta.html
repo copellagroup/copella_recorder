@@ -14,13 +14,23 @@
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/lamejs@1.2.1/lame.min.js"></script>
     
-    <!-- Google Fonts -->
+    <!-- Preload critical resources -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Gilroy:wght@400;500;600;700;800&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gilroy:wght@400;500;600;700;800&display=swap"></noscript>
+    
+    <!-- Google Fonts with preconnect -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Gilroy:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-    <!-- Tailwind CSS via CDN -->
+    <!-- Tailwind CSS via CDN with fallback -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        // Fallback for Tailwind CSS loading
+        if (typeof tailwind === 'undefined') {
+            console.warn('Tailwind CSS failed to load, applying fallback styles');
+            document.head.insertAdjacentHTML('beforeend', '<style>body{font-family:system-ui,-apple-system,sans-serif;background:#0A0A0A;color:#fff}</style>');
+        }
+    </script>
     <script>
         tailwind.config = {
             theme: {
@@ -43,6 +53,29 @@
         }
     </script>
     <style>
+        /* Critical styles to prevent FOUC */
+        html, body { 
+            background-color: #0A0A0A !important; 
+            color: #FFFFFF !important; 
+            font-family: 'Gilroy', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            height: 100% !important;
+            overflow: hidden !important;
+        }
+        
+        /* Hide content until styles are loaded */
+        .app-container { 
+            opacity: 0 !important; 
+            transition: opacity 0.3s ease-in-out !important;
+        }
+        
+        /* Show content when styles are ready */
+        .styles-loaded .app-container { 
+            opacity: 1 !important; 
+        }
+        
+        /* Additional critical styles */
         * { -webkit-tap-highlight-color: transparent; }
         input[type="search"]::-webkit-search-cancel-button { display: none; }
         .modal-content { max-height: 90vh; }
@@ -844,6 +877,52 @@
             
             // --- INITIALIZATION ---
             async function init() { try { await DB.init(); } catch (err) { console.error("Failed to init DB. Recordings will not be saved.", err); showToast('Хранилище записей не инициализировано. Записи не будут сохраняться.', 'error', 5000); } state.stations = Storage.getStations() || DEFAULT_STATIONS; if(Storage.getStations() === null) Storage.saveStations(); state.scheduledRecordings = Storage.getSchedules(); DOM.audioPlayer.volume = Storage.getVolume(); renderPlayer(null); renderStationsList(); updateMskTime(); setInterval(updateMskTime, 5000); state.scheduleCheckInterval = setInterval(checkSchedules, 5000); DOM.addStationHeaderBtn.onclick = () => { hapticFeedback(); openStationModal(); }; DOM.emptyAddBtn.onclick = () => { hapticFeedback(); openStationModal(); }; if (DOM.stationSearchInput) { DOM.stationSearchInput.oninput = (e) => handleSearch(e.target.value); } DOM.schedulerBtn.onclick = () => { hapticFeedback(); openSchedulerModal(); }; DOM.recordingsBtn.onclick = () => { hapticFeedback(); openRecordingsModal(); }; DOM.settingsBtn.onclick = () => { hapticFeedback(); openSettingsModal(); }; window.addEventListener('resize', resizeCanvas); DOM.audioPlayer.onplay = () => { updatePlayPauseIcon(); setupVisualizer(); DOM.playerPanel.classList.remove('loading', 'error'); document.querySelectorAll('.station-list-item.active .playing-indicator').forEach(el => el.classList.add('hidden')); const activeItem = document.querySelector(`.station-list-item[data-index='${state.currentStationIndex}']`); if (activeItem) activeItem.querySelector('.playing-indicator')?.classList.remove('hidden'); if (state.pendingScheduledRecording) { const schedule = state.pendingScheduledRecording; schedule.status = 'recording'; toggleRecording(); setTimeout(() => { if (state.mediaRecorder?.state === 'recording') toggleRecording(); schedule.status = 'finished'; Storage.saveSchedules(); if (!DOM.schedulerModal.classList.contains('opacity-0')) renderScheduleList(); }, schedule.duration * 60 * 1000); Storage.saveSchedules(); if (!DOM.schedulerModal.classList.contains('opacity-0')) renderScheduleList(); state.pendingScheduledRecording = null; } }; DOM.audioPlayer.onpause = () => { updatePlayPauseIcon(); DOM.playerPanel.classList.remove('loading'); document.querySelectorAll('.playing-indicator').forEach(item => item.classList.add('hidden')); }; DOM.audioPlayer.onvolumechange = updateVolumeUI; DOM.audioPlayer.onerror = () => { DOM.playerPanel.classList.remove('loading'); DOM.playerPanel.classList.add('error'); updateNowPlayingUI('Ошибка потока'); }; if (!localStorage.getItem(config.STORAGE_KEYS.welcomeSeen)) setTimeout(openWelcomeModal, 500); }
+            // Style loading management
+            function handleStyleLoading() {
+                // Check if Tailwind CSS is loaded
+                const checkTailwindLoaded = () => {
+                    const testElement = document.createElement('div');
+                    testElement.className = 'bg-bg-color';
+                    document.body.appendChild(testElement);
+                    const computedStyle = window.getComputedStyle(testElement);
+                    const isLoaded = computedStyle.backgroundColor === 'rgb(10, 10, 10)';
+                    document.body.removeChild(testElement);
+                    return isLoaded;
+                };
+                
+                // Check if fonts are loaded
+                const checkFontsLoaded = () => {
+                    return document.fonts ? document.fonts.ready : Promise.resolve();
+                };
+                
+                // Show content when everything is ready
+                const showContent = () => {
+                    document.body.classList.add('styles-loaded');
+                };
+                
+                // Check styles immediately
+                if (checkTailwindLoaded()) {
+                    checkFontsLoaded().then(showContent);
+                } else {
+                    // Wait for Tailwind CSS to load
+                    const checkInterval = setInterval(() => {
+                        if (checkTailwindLoaded()) {
+                            clearInterval(checkInterval);
+                            checkFontsLoaded().then(showContent);
+                        }
+                    }, 50);
+                    
+                    // Fallback timeout
+                    setTimeout(() => {
+                        clearInterval(checkInterval);
+                        showContent();
+                    }, 2000);
+                }
+            }
+            
+            // Initialize style loading management
+            handleStyleLoading();
+
             init();
         });
     </script>
