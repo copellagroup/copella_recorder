@@ -80,37 +80,109 @@ window.CopellaRecording = (function(){
   }
   function processRecording() {
     if (CopellaState.audioChunks.length === 0) { CopellaUI.showToast('Запись не удалась. Файл пуст.', 'error'); resetRecordingUI(); return; }
-    var webmBlob = new Blob(CopellaState.audioChunks, { type: (CopellaState.audioChunks[0] && CopellaState.audioChunks[0].type) || 'audio/webm' });
+    var audioBlob = new Blob(CopellaState.audioChunks, { type: (CopellaState.audioChunks[0] && CopellaState.audioChunks[0].type) || 'audio/webm' });
     var durationInSeconds = Math.round((Date.now() - CopellaState.recordingStartTime) / 1000);
     var station = CopellaState.stations[CopellaState.currentStationIndex];
     resetRecordingUI();
-    if (CopellaStorage.getRecordingFormat() === 'webm') {
-      var data = { id: Date.now(), stationName: station.name, stationIcon: station.icon, date: new Date().toISOString(), duration: durationInSeconds, blob: webmBlob };
-      CopellaDB.saveRecording(data).then(function(){ CopellaState.hasNewRecordings = true; updateNewRecordingBadge(); CopellaUI.showToast('Запись WebM сохранена!', 'success'); });
+    
+    // Если формат WebM или браузер не поддерживает декодирование, сохраняем как есть
+    if (CopellaStorage.getRecordingFormat() === 'webm' || !canDecodeAudio()) {
+      var data = { id: Date.now(), stationName: station.name, stationIcon: station.icon, date: new Date().toISOString(), duration: durationInSeconds, blob: audioBlob };
+      CopellaDB.saveRecording(data).then(function(){ 
+        CopellaState.hasNewRecordings = true; 
+        updateNewRecordingBadge(); 
+        var format = CopellaStorage.getRecordingFormat() === 'webm' ? 'WebM' : 'WebM (MP3 недоступен)';
+        CopellaUI.showToast('Запись ' + format + ' сохранена!', 'success'); 
+      });
       return;
     }
-    showConversionProgress(true); document.getElementById('conversion-status-text').textContent = 'Декодирование...';
-    var audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    webmBlob.arrayBuffer().then(function(arrayBuffer){
-      audioContext.decodeAudioData(arrayBuffer).then(function(audioBuffer){
-        var channelsData = []; var transferable = [];
-        for (var i = 0; i < audioBuffer.numberOfChannels; i++) { var channel = audioBuffer.getChannelData(i); channelsData.push(channel); transferable.push(channel.buffer); }
-        if (durationInSeconds > 60 * 10) { CopellaUI.showToast('Началась обработка длинной записи. Это может занять несколько минут.', 'info', 5000); }
-        if (CopellaState.converterWorker) CopellaState.converterWorker.terminate();
-        CopellaState.converterWorker = new Worker((window.CopellaRuntime ? CopellaRuntime.pluginUrl : '') + 'assets/js/mp3-encoder.js');
-        CopellaState.converterWorker.onmessage = function(event){ var type = event.data.type, progress = event.data.progress, mp3Blob = event.data.mp3Blob, message = event.data.message; if (type === 'progress') { document.getElementById('conversion-progress-bar').style.width = progress + '%'; document.getElementById('conversion-status-text').textContent = 'Кодирование... ' + progress + '%'; } else if (type === 'complete') { var rec = { id: Date.now(), stationName: station.name, stationIcon: station.icon, date: new Date().toISOString(), duration: durationInSeconds, blob: mp3Blob }; CopellaDB.saveRecording(rec).then(function(){ CopellaState.hasNewRecordings = true; updateNewRecordingBadge(); CopellaUI.showToast('Запись MP3 сохранена!', 'success'); showConversionProgress(false); CopellaState.converterWorker.terminate(); CopellaState.converterWorker = null; }); } else if (type === 'error') { throw new Error(message); } };
-        CopellaState.converterWorker.onerror = function(err){ 
-          console.error('Worker error:', err);
-          CopellaUI.showToast('Ошибка конвертации: ' + (err.message || 'Неизвестная ошибка'), 'error'); 
-          showConversionProgress(false);
-          if (CopellaState.converterWorker) {
-            CopellaState.converterWorker.terminate();
-            CopellaState.converterWorker = null;
+    
+    // Попытка конвертации в MP3
+    showConversionProgress(true); 
+    document.getElementById('conversion-status-text').textContent = 'Декодирование...';
+    
+    try {
+      var audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      audioBlob.arrayBuffer().then(function(arrayBuffer){
+        audioContext.decodeAudioData(arrayBuffer).then(function(audioBuffer){
+          var channelsData = []; var transferable = [];
+          for (var i = 0; i < audioBuffer.numberOfChannels; i++) { 
+            var channel = audioBuffer.getChannelData(i); 
+            channelsData.push(channel); 
+            transferable.push(channel.buffer); 
           }
-        };
-        CopellaState.converterWorker.postMessage({ channels: channelsData, sampleRate: audioBuffer.sampleRate }, transferable);
-      }).catch(function(error){ console.error(error); CopellaUI.showToast('Не удалось декодировать запись: ' + error.message, 'error', 5000); showConversionProgress(false); });
-    }).catch(function(error){ CopellaUI.showToast('Ошибка чтения записи: ' + error.message, 'error'); showConversionProgress(false); });
+          if (durationInSeconds > 60 * 10) { 
+            CopellaUI.showToast('Началась обработка длинной записи. Это может занять несколько минут.', 'info', 5000); 
+          }
+          if (CopellaState.converterWorker) CopellaState.converterWorker.terminate();
+          CopellaState.converterWorker = new Worker((window.CopellaRuntime ? CopellaRuntime.pluginUrl : '') + 'assets/js/mp3-encoder.js');
+          CopellaState.converterWorker.onmessage = function(event){ 
+            var type = event.data.type, progress = event.data.progress, mp3Blob = event.data.mp3Blob, message = event.data.message; 
+            if (type === 'progress') { 
+              document.getElementById('conversion-progress-bar').style.width = progress + '%'; 
+              document.getElementById('conversion-status-text').textContent = 'Кодирование... ' + progress + '%'; 
+            } else if (type === 'complete') { 
+              var rec = { id: Date.now(), stationName: station.name, stationIcon: station.icon, date: new Date().toISOString(), duration: durationInSeconds, blob: mp3Blob }; 
+              CopellaDB.saveRecording(rec).then(function(){ 
+                CopellaState.hasNewRecordings = true; 
+                updateNewRecordingBadge(); 
+                CopellaUI.showToast('Запись MP3 сохранена!', 'success'); 
+                showConversionProgress(false); 
+                CopellaState.converterWorker.terminate(); 
+                CopellaState.converterWorker = null; 
+              }); 
+            } else if (type === 'error') { 
+              throw new Error(message); 
+            } 
+          };
+          CopellaState.converterWorker.onerror = function(err){ 
+            console.error('Worker error:', err);
+            CopellaUI.showToast('Ошибка конвертации: ' + (err.message || 'Неизвестная ошибка'), 'error'); 
+            showConversionProgress(false);
+            if (CopellaState.converterWorker) {
+              CopellaState.converterWorker.terminate();
+              CopellaState.converterWorker = null;
+            }
+          };
+          CopellaState.converterWorker.postMessage({ channels: channelsData, sampleRate: audioBuffer.sampleRate }, transferable);
+        }).catch(function(error){ 
+          console.error('Decode error:', error); 
+          CopellaUI.showToast('Не удалось декодировать запись. Сохраняем в формате WebM.', 'warning', 5000); 
+          showConversionProgress(false);
+          // Fallback: сохраняем как WebM
+          var data = { id: Date.now(), stationName: station.name, stationIcon: station.icon, date: new Date().toISOString(), duration: durationInSeconds, blob: audioBlob };
+          CopellaDB.saveRecording(data).then(function(){ 
+            CopellaState.hasNewRecordings = true; 
+            updateNewRecordingBadge(); 
+            CopellaUI.showToast('Запись WebM сохранена!', 'success'); 
+          });
+        });
+      }).catch(function(error){ 
+        console.error('ArrayBuffer error:', error); 
+        CopellaUI.showToast('Ошибка чтения записи: ' + error.message, 'error'); 
+        showConversionProgress(false); 
+      });
+    } catch (error) {
+      console.error('AudioContext error:', error);
+      CopellaUI.showToast('Ошибка создания аудиоконтекста. Сохраняем в формате WebM.', 'warning', 5000);
+      showConversionProgress(false);
+      // Fallback: сохраняем как WebM
+      var data = { id: Date.now(), stationName: station.name, stationIcon: station.icon, date: new Date().toISOString(), duration: durationInSeconds, blob: audioBlob };
+      CopellaDB.saveRecording(data).then(function(){ 
+        CopellaState.hasNewRecordings = true; 
+        updateNewRecordingBadge(); 
+        CopellaUI.showToast('Запись WebM сохранена!', 'success'); 
+      });
+    }
+  }
+  
+  function canDecodeAudio() {
+    try {
+      var audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      return audioContext && typeof audioContext.decodeAudioData === 'function';
+    } catch (e) {
+      return false;
+    }
   }
   function updateNewRecordingBadge() { CopellaDOM.newRecordingBadge.classList.toggle('hidden', !CopellaState.hasNewRecordings); }
   function openRecordingsModal() {

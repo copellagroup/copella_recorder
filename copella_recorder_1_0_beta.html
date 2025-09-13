@@ -255,39 +255,59 @@
             function showConversionProgress(show) { const container = document.getElementById('conversion-progress-container'), nowPlaying = document.getElementById('player-now-playing'); if (!container || !nowPlaying) return; if (show) { container.classList.remove('hidden'); nowPlaying.classList.add('hidden'); } else { container.classList.add('hidden'); nowPlaying.classList.remove('hidden'); document.getElementById('conversion-progress-bar').style.width = '0%'; document.getElementById('conversion-status-text').textContent = 'Обработка...'; } }
             async function processRecording() {
                 if (state.audioChunks.length === 0) { showToast("Запись не удалась. Файл пуст.", 'error'); resetRecordingUI(); return; }
-                const webmBlob = new Blob(state.audioChunks, { type: 'audio/webm' });
+                const audioBlob = new Blob(state.audioChunks, { type: 'audio/webm' });
                 const durationInSeconds = Math.round((Date.now() - state.recordingStartTime) / 1000);
                 const station = state.stations[state.currentStationIndex];
                 resetRecordingUI();
                 
-                if (Storage.getRecordingFormat() === 'webm') {
-                    const recordData = { id: Date.now(), stationName: station.name, stationIcon: station.icon, date: new Date().toISOString(), duration: durationInSeconds, blob: webmBlob };
+                // Если формат WebM или браузер не поддерживает декодирование, сохраняем как есть
+                if (Storage.getRecordingFormat() === 'webm' || !canDecodeAudio()) {
+                    const recordData = { id: Date.now(), stationName: station.name, stationIcon: station.icon, date: new Date().toISOString(), duration: durationInSeconds, blob: audioBlob };
                     await DB.saveRecording(recordData);
                     state.hasNewRecordings = true;
                     updateNewRecordingBadge();
-                    showToast('Запись WebM сохранена!', 'success');
+                    const format = Storage.getRecordingFormat() === 'webm' ? 'WebM' : 'WebM (MP3 недоступен)';
+                    showToast(`Запись ${format} сохранена!`, 'success');
                     return;
                 }
 
-                showConversionProgress(true); document.getElementById('conversion-status-text').textContent = `Декодирование...`;
+                // Попытка конвертации в MP3
+                showConversionProgress(true); 
+                document.getElementById('conversion-status-text').textContent = 'Декодирование...';
+                
                 try {
                     const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                    const arrayBuffer = await webmBlob.arrayBuffer();
+                    const arrayBuffer = await audioBlob.arrayBuffer();
                     const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
                     const channelsData = []; const transferable = [];
-                    for (let i = 0; i < audioBuffer.numberOfChannels; i++) { const channel = audioBuffer.getChannelData(i); channelsData.push(channel); transferable.push(channel.buffer); }
-                    if (durationInSeconds > 60 * 10) { showToast("Началась обработка длинной записи. Это может занять несколько минут.", "info", 5000); }
+                    for (let i = 0; i < audioBuffer.numberOfChannels; i++) { 
+                        const channel = audioBuffer.getChannelData(i); 
+                        channelsData.push(channel); 
+                        transferable.push(channel.buffer); 
+                    }
+                    if (durationInSeconds > 60 * 10) { 
+                        showToast("Началась обработка длинной записи. Это может занять несколько минут.", "info", 5000); 
+                    }
                     if (state.converterWorker) state.converterWorker.terminate();
                     const workerBlob = new Blob([WORKER_SCRIPT_STRING], { type: 'application/javascript' });
                     state.converterWorker = new Worker(URL.createObjectURL(workerBlob));
                     state.converterWorker.onmessage = async (event) => {
                         const { type, progress, mp3Blob, message } = event.data;
-                        if (type === 'progress') { document.getElementById('conversion-progress-bar').style.width = `${progress}%`; document.getElementById('conversion-status-text').textContent = `Кодирование... ${progress}%`; } 
-                        else if (type === 'complete') {
+                        if (type === 'progress') { 
+                            document.getElementById('conversion-progress-bar').style.width = `${progress}%`; 
+                            document.getElementById('conversion-status-text').textContent = `Кодирование... ${progress}%`; 
+                        } else if (type === 'complete') {
                             const recordData = { id: Date.now(), stationName: station.name, stationIcon: station.icon, date: new Date().toISOString(), duration: durationInSeconds, blob: mp3Blob };
-                            await DB.saveRecording(recordData); state.hasNewRecordings = true; updateNewRecordingBadge(); showToast('Запись MP3 сохранена!', 'success');
-                            showConversionProgress(false); state.converterWorker.terminate(); state.converterWorker = null;
-                        } else if (type === 'error') { throw new Error(message); }
+                            await DB.saveRecording(recordData); 
+                            state.hasNewRecordings = true; 
+                            updateNewRecordingBadge(); 
+                            showToast('Запись MP3 сохранена!', 'success');
+                            showConversionProgress(false); 
+                            state.converterWorker.terminate(); 
+                            state.converterWorker = null;
+                        } else if (type === 'error') { 
+                            throw new Error(message); 
+                        }
                     };
                     state.converterWorker.onerror = (err) => { 
                         console.error('Worker error:', err);
@@ -300,8 +320,28 @@
                     };
                     state.converterWorker.postMessage({ channels: channelsData, sampleRate: audioBuffer.sampleRate }, transferable);
                 } catch(error) {
-                    console.error('Ошибка обработки записи:', error); showToast(`Не удалось сконвертировать запись: ${error.message}`, 'error', 5000); showConversionProgress(false);
-                    if (state.converterWorker) { state.converterWorker.terminate(); state.converterWorker = null; }
+                    console.error('Ошибка обработки записи:', error); 
+                    showToast('Не удалось декодировать запись. Сохраняем в формате WebM.', 'warning', 5000); 
+                    showConversionProgress(false);
+                    // Fallback: сохраняем как WebM
+                    const recordData = { id: Date.now(), stationName: station.name, stationIcon: station.icon, date: new Date().toISOString(), duration: durationInSeconds, blob: audioBlob };
+                    await DB.saveRecording(recordData);
+                    state.hasNewRecordings = true;
+                    updateNewRecordingBadge();
+                    showToast('Запись WebM сохранена!', 'success');
+                    if (state.converterWorker) { 
+                        state.converterWorker.terminate(); 
+                        state.converterWorker = null; 
+                    }
+                }
+            }
+            
+            function canDecodeAudio() {
+                try {
+                    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    return audioContext && typeof audioContext.decodeAudioData === 'function';
+                } catch (e) {
+                    return false;
                 }
             }
             function updateRecordingTimer() { const container = document.getElementById('player-now-playing'); if (!container) return; const elapsed = Math.floor((Date.now() - state.recordingStartTime) / 1000); const m = String(Math.floor(elapsed / 60)).padStart(2, '0'), s = String(elapsed % 60).padStart(2, '0'); container.textContent = `Запись ${m}:${s}`; }
