@@ -17,7 +17,12 @@ html.cp-sb-expanded { --cp-sb-left: var(--cp-sb-expanded-w); }
 .cp-sb__logo--mini { width: 32px; height: 32px; display: block; object-fit: contain; }
 .cp-sb__logo--full { display: none; height: 32px; width: auto; object-fit: contain; }
 
-.cp-sb__nav { display: flex; flex-direction: column; gap: 8px; width: 100%; margin-top: 8px; }
+.cp-sb__nav { display: flex; flex-direction: column; gap: 8px; width: 100%; margin-top: 8px; flex: 1; }
+
+/* Services section */
+.cp-sb__services { margin-top: auto; padding-top: 16px; border-top: 1px solid rgba(255,255,255,.06); }
+.cp-sb__services-title { font-size: 11px; font-weight: 700; color: var(--cp-sb-fg-dim); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; padding: 0 8px; }
+.cp-sb__services-nav { display: flex; flex-direction: column; gap: 4px; }
 
 /* Hide internal sidebar burger globally (use header burger on mobile instead) */
 .cp-sb__burger { display: none !important; }
@@ -66,6 +71,8 @@ html.cp-sb-expanded .cp-sb__item { display: grid; grid-template-columns: 24px 1f
 html.cp-sb-expanded .cp-sb__logo--mini { display: none; }
 html.cp-sb-expanded .cp-sb__logo--full { display: block; height: 32px; width: auto; object-fit: contain; }
 html.cp-sb-expanded .cp-sb__nav { padding-left: 8px; }
+html.cp-sb-expanded .cp-sb__services { padding-left: 8px; }
+html.cp-sb-expanded .cp-sb__services-title { padding-left: 16px; }
 /* Smoothly reveal labels when expanded via burger */
 html.cp-sb-expanded .cp-sb__label { opacity: 1; max-width: 160px; transform: translateX(0); }
 
@@ -118,6 +125,11 @@ html.cp-sb-expanded .cp-sb__label { opacity: 1; max-width: 160px; transform: tra
   
   .cp-sb__drawer .cp-sb__label { display: inline; }
   .cp-sb__drawer .cp-sb__label { opacity: 1; max-width: none; transform: none; }
+  
+  /* Services section in drawer */
+  .cp-sb__drawer-services { margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,.06); }
+  .cp-sb__drawer-services-title { font-size: 11px; font-weight: 700; color: var(--cp-sb-fg-dim); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; padding: 0 16px; }
+  .cp-sb__drawer-services-nav { display: flex; flex-direction: column; gap: 4px; }
 }
 
 /* Ensure drawer and scrim are inert on desktop to avoid black overlay */

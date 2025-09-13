@@ -42,12 +42,19 @@
         </span>
         <span class="cp-sb__label">Задонатить</span>
       </a>
-      <a class="cp-sb__item cp-sb__recorder" href="https://copella.live/copella-recorder" title="Copella Recorder">
-        <span class="cp-sb__icon" aria-hidden="true">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g fill="currentColor"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6" fill="#1a1a1a"/><circle cx="12" cy="12" r="2"/></g></svg>
-        </span>
-        <span class="cp-sb__label">Copella Recorder</span>
-      </a>
+    </nav>
+    
+    <div class="cp-sb__services">
+      <div class="cp-sb__services-title">Сервисы</div>
+      <nav class="cp-sb__services-nav">
+        <a class="cp-sb__item cp-sb__recorder" href="https://copella.live/copella-recorder" title="Copella Recorder">
+          <span class="cp-sb__icon" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g fill="currentColor"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6" fill="#1a1a1a"/><circle cx="12" cy="12" r="2"/></g></svg>
+          </span>
+          <span class="cp-sb__label">Copella Recorder</span>
+        </a>
+      </nav>
+    </div>
     </nav>
     
   </div>
@@ -104,12 +111,19 @@
         </span>
         <span class="cp-sb__label">Задонатить</span>
       </a>
-      <a class="cp-sb__drawer-item cp-sb__recorder" href="https://copella.live/copella-recorder" title="Copella Recorder">
-        <span class="cp-sb__icon" aria-hidden="true">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g fill="currentColor"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6" fill="#1a1a1a"/><circle cx="12" cy="12" r="2"/></g></svg>
-        </span>
-        <span class="cp-sb__label">Copella Recorder</span>
-      </a>
+    </nav>
+    
+    <div class="cp-sb__drawer-services">
+      <div class="cp-sb__drawer-services-title">Сервисы</div>
+      <nav class="cp-sb__drawer-services-nav">
+        <a class="cp-sb__drawer-item cp-sb__recorder" href="https://copella.live/copella-recorder" title="Copella Recorder">
+          <span class="cp-sb__icon" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g fill="currentColor"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6" fill="#1a1a1a"/><circle cx="12" cy="12" r="2"/></g></svg>
+          </span>
+          <span class="cp-sb__label">Copella Recorder</span>
+        </a>
+      </nav>
+    </div>
     </nav>
   </div>
 </aside>
