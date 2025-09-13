@@ -26,9 +26,8 @@ window.CopellaVisualizer = (function(){
     ctx.clearRect(0, 0, width, height);
     var barWidth = (width / dataArray.length) * 1.5; var x = 0;
     
-    // Определяем цвет эквалайзера - красный при записи
-    var isRecording = CopellaState.isRecording || false;
-    var barColor = isRecording ? 'rgba(255, 69, 58, 0.8)' : 'rgba(255, 255, 255, 0.05)';
+    // Цвет эквалайзера - всегда стандартный
+    var barColor = 'rgba(255, 255, 255, 0.05)';
     ctx.fillStyle = barColor;
     
     for (var i = 0; i < dataArray.length; i++) {

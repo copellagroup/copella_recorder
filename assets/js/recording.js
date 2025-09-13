@@ -213,6 +213,8 @@ window.CopellaRecording = (function(){
       + '<div class="flex justify-between items-center mb-4 flex-shrink-0">'
       + '<h2 class="text-lg font-bold">Мои Записи</h2>'
       + '<div class="flex gap-2">'
+      + '<button id="createPlaylistBtn" class="p-2 text-sm font-bold rounded-small border border-border-color bg-accent-purple text-white cursor-pointer">Плейлист</button>'
+      + '<button id="exportBtn" class="p-2 text-sm font-bold rounded-small border border-border-color bg-accent-green text-white cursor-pointer">Экспорт</button>'
       + '<button id="selectAllBtn" class="p-2 text-sm font-bold rounded-small border border-border-color bg-zinc-800 text-text-primary cursor-pointer">Выбрать все</button>'
       + '<button id="batchDeleteBtn" class="p-2 text-sm font-bold rounded-small border border-border-color bg-record text-white cursor-pointer hidden">Удалить выбранные</button>'
       + '<button class="close-btn text-2xl text-text-secondary">&times;</button>'
@@ -250,6 +252,24 @@ window.CopellaRecording = (function(){
     renderRecordingsList();
     setupRecordingPlayer();
     setupBatchOperations();
+    
+    // Обработчики для новых функций
+    CopellaDOM.recordingsModal.querySelector('#createPlaylistBtn').onclick = function() {
+      createPlaylistFromRecordings();
+    };
+    
+    CopellaDOM.recordingsModal.querySelector('#exportBtn').onclick = function() {
+      var exportMenu = '<div class="absolute top-full right-0 mt-2 bg-zinc-800 border border-border-color rounded-small shadow-lg z-50">' +
+        '<button class="w-full p-2 text-sm text-left hover:bg-zinc-700" onclick="CopellaRecording.exportRecordings(\'json\')">JSON</button>' +
+        '<button class="w-full p-2 text-sm text-left hover:bg-zinc-700" onclick="CopellaRecording.exportRecordings(\'csv\')">CSV</button>' +
+        '<button class="w-full p-2 text-sm text-left hover:bg-zinc-700" onclick="CopellaRecording.exportRecordings(\'txt\')">TXT</button>' +
+        '</div>';
+      
+      var btn = CopellaDOM.recordingsModal.querySelector('#exportBtn');
+      btn.style.position = 'relative';
+      btn.innerHTML = 'Экспорт' + exportMenu;
+    };
+    
     CopellaDOM.recordingsModal.querySelector('.close-btn').onclick = function(){ 
       stopRecordingPlayback();
       CopellaUI.closeModal(CopellaDOM.recordingsModal); 
@@ -546,5 +566,184 @@ window.CopellaRecording = (function(){
     });
   }
   
-  return { toggleRecording: toggleRecording, openRecordingsModal: openRecordingsModal, playRecording: playRecording, stopRecordingPlayback: stopRecordingPlayback };
+  // --- НОВЫЕ ФУНКЦИИ v1.2 ---
+  
+  // Автоматическое создание плейлистов
+  function createPlaylistFromRecordings() {
+    CopellaDB.getRecordings().then(function(recordings) {
+      if (recordings.length === 0) {
+        CopellaUI.showToast('Нет записей для создания плейлиста', 'warning');
+        return;
+      }
+      
+      var playlistName = 'Плейлист ' + new Date().toLocaleDateString('ru-RU');
+      var playlist = {
+        id: Date.now(),
+        name: playlistName,
+        recordings: recordings.map(function(rec) {
+          return {
+            id: rec.id,
+            title: rec.stationName + ' - ' + new Date(rec.date).toLocaleString('ru-RU'),
+            duration: rec.duration,
+            date: rec.date
+          };
+        }),
+        createdAt: new Date().toISOString()
+      };
+      
+      // Сохраняем плейлист в localStorage
+      var playlists = JSON.parse(localStorage.getItem('copella_playlists') || '[]');
+      playlists.push(playlist);
+      localStorage.setItem('copella_playlists', JSON.stringify(playlists));
+      
+      CopellaUI.showToast('Плейлист "' + playlistName + '" создан! (' + recordings.length + ' записей)', 'success');
+    });
+  }
+  
+  // Система тегов для записей
+  function addTagToRecording(recordingId, tag) {
+    CopellaDB.getRecordings().then(function(recordings) {
+      var recording = recordings.find(function(r) { return r.id === recordingId; });
+      if (!recording) return;
+      
+      if (!recording.tags) recording.tags = [];
+      if (!recording.tags.includes(tag)) {
+        recording.tags.push(tag);
+        CopellaDB.saveRecording(recording);
+        CopellaUI.showToast('Тег "' + tag + '" добавлен к записи', 'success');
+      }
+    });
+  }
+  
+  function removeTagFromRecording(recordingId, tag) {
+    CopellaDB.getRecordings().then(function(recordings) {
+      var recording = recordings.find(function(r) { return r.id === recordingId; });
+      if (!recording || !recording.tags) return;
+      
+      var index = recording.tags.indexOf(tag);
+      if (index > -1) {
+        recording.tags.splice(index, 1);
+        CopellaDB.saveRecording(recording);
+        CopellaUI.showToast('Тег "' + tag + '" удален', 'success');
+      }
+    });
+  }
+  
+  // Поиск по записям
+  function searchRecordings(query) {
+    CopellaDB.getRecordings().then(function(recordings) {
+      var filtered = recordings.filter(function(rec) {
+        var searchText = (rec.stationName + ' ' + rec.date + ' ' + (rec.tags ? rec.tags.join(' ') : '')).toLowerCase();
+        return searchText.includes(query.toLowerCase());
+      });
+      
+      // Обновляем отображение списка
+      var recordingsList = document.getElementById('recordingsList');
+      if (recordingsList) {
+        recordingsList.innerHTML = '';
+        filtered.forEach(function(rec) {
+          var item = createRecordingItem(rec);
+          recordingsList.appendChild(item);
+        });
+      }
+      
+      CopellaUI.showToast('Найдено записей: ' + filtered.length, 'info');
+    });
+  }
+  
+  // Автоматическое переименование записей
+  function autoRenameRecording(recordingId, newName) {
+    CopellaDB.getRecordings().then(function(recordings) {
+      var recording = recordings.find(function(r) { return r.id === recordingId; });
+      if (!recording) return;
+      
+      recording.customName = newName;
+      CopellaDB.saveRecording(recording);
+      CopellaUI.showToast('Запись переименована в "' + newName + '"', 'success');
+    });
+  }
+  
+  // Умное переименование на основе времени и станции
+  function smartRenameRecording(recordingId) {
+    CopellaDB.getRecordings().then(function(recordings) {
+      var recording = recordings.find(function(r) { return r.id === recordingId; });
+      if (!recording) return;
+      
+      var date = new Date(recording.date);
+      var timeStr = date.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+      var dateStr = date.toLocaleDateString('ru-RU');
+      var smartName = recording.stationName + ' - ' + dateStr + ' ' + timeStr;
+      
+      recording.customName = smartName;
+      CopellaDB.saveRecording(recording);
+      CopellaUI.showToast('Запись переименована: "' + smartName + '"', 'success');
+    });
+  }
+  
+  // Экспорт записей в различных форматах
+  function exportRecordings(format) {
+    CopellaDB.getRecordings().then(function(recordings) {
+      var data = recordings.map(function(rec) {
+        return {
+          station: rec.stationName,
+          date: rec.date,
+          duration: rec.duration,
+          tags: rec.tags || [],
+          customName: rec.customName || ''
+        };
+      });
+      
+      var content, filename, mimeType;
+      
+      switch(format) {
+        case 'json':
+          content = JSON.stringify(data, null, 2);
+          filename = 'recordings-' + new Date().toISOString().slice(0, 10) + '.json';
+          mimeType = 'application/json';
+          break;
+        case 'csv':
+          content = 'Станция,Дата,Длительность,Теги,Название\n' + 
+                   data.map(function(r) {
+                     return '"' + r.station + '","' + r.date + '",' + r.duration + ',"' + (r.tags.join(', ') || '') + '","' + (r.customName || '') + '"';
+                   }).join('\n');
+          filename = 'recordings-' + new Date().toISOString().slice(0, 10) + '.csv';
+          mimeType = 'text/csv';
+          break;
+        case 'txt':
+          content = 'СПИСОК ЗАПИСЕЙ\n' + '='.repeat(50) + '\n\n' +
+                   data.map(function(r, i) {
+                     return (i + 1) + '. ' + r.station + '\n   Дата: ' + r.date + '\n   Длительность: ' + formatTime(r.duration) + '\n   Теги: ' + (r.tags.join(', ') || 'нет') + '\n   Название: ' + (r.customName || 'автоматическое') + '\n';
+                   }).join('\n');
+          filename = 'recordings-' + new Date().toISOString().slice(0, 10) + '.txt';
+          mimeType = 'text/plain';
+          break;
+      }
+      
+      var blob = new Blob([content], { type: mimeType });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      
+      CopellaUI.showToast('Экспорт в ' + format.toUpperCase() + ' завершен!', 'success');
+    });
+  }
+  
+  return { 
+    toggleRecording: toggleRecording, 
+    openRecordingsModal: openRecordingsModal, 
+    playRecording: playRecording, 
+    stopRecordingPlayback: stopRecordingPlayback,
+    createPlaylistFromRecordings: createPlaylistFromRecordings,
+    addTagToRecording: addTagToRecording,
+    removeTagFromRecording: removeTagFromRecording,
+    searchRecordings: searchRecordings,
+    autoRenameRecording: autoRenameRecording,
+    smartRenameRecording: smartRenameRecording,
+    exportRecordings: exportRecordings
+  };
 })();

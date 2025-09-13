@@ -81,7 +81,7 @@ window.CopellaModals = (function(){
       '</div></div>' +
       '</div></div>' +
       '</div>' +
-      '<div class="text-center text-xs text-text-secondary pt-2 mt-3"><strong>Copella Recorder 1.1</strong><br>© 2025 Copella</div>' +
+      '<div class="text-center text-xs text-text-secondary pt-2 mt-3"><strong>Copella Recorder 1.2</strong><br>© 2025 Copella</div>' +
       '</div>';
     CopellaUI.openModal(CopellaDOM.settingsModal, content);
     CopellaDOM.settingsModal.querySelector('.close-btn').onclick = function(){ CopellaUI.closeModal(CopellaDOM.settingsModal); };
