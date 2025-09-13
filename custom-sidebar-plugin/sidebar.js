@@ -26,12 +26,18 @@
     if (headerBurger) headerBurger.setAttribute('aria-expanded', 'true');
     try { drawer.focus(); } catch(_){ }
     document.body.style.overflow = 'hidden';
+    
+    // Add swipe and touch handlers
+    addMobileHandlers();
   }
   function closeDrawer(){
     if (!drawer) return;
     drawer.classList.remove('is-open'); if (scrim) scrim.classList.remove('is-visible');
     if (burger) burger.setAttribute('aria-expanded', 'false');
     if (headerBurger) headerBurger.setAttribute('aria-expanded', 'false');
+    
+    // Remove mobile handlers
+    removeMobileHandlers();
     
     setTimeout(function(){
       if (drawer) drawer.hidden = true; if (scrim) scrim.hidden = true;
@@ -51,6 +57,97 @@
   }, false);
   if (headerBurger) headerBurger.addEventListener('click', function(){ toggleFrom(headerBurger); }, false);
   if (scrim) scrim.addEventListener('click', function(e){ if(e.target===scrim){ closeDrawer(); } }, false);
+
+  // Mobile touch handlers for swipe and empty area click
+  var touchStartX = 0;
+  var touchStartY = 0;
+  var touchStartTime = 0;
+  var isDragging = false;
+  var drawerStartX = 0;
+
+  function addMobileHandlers() {
+    if (!drawer || !isMobile()) return;
+    
+    // Add touch event listeners
+    drawer.addEventListener('touchstart', handleTouchStart, { passive: true });
+    drawer.addEventListener('touchmove', handleTouchMove, { passive: false });
+    drawer.addEventListener('touchend', handleTouchEnd, { passive: true });
+    
+    // Add click handler for empty areas
+    drawer.addEventListener('click', handleDrawerClick, false);
+  }
+
+  function removeMobileHandlers() {
+    if (!drawer) return;
+    
+    drawer.removeEventListener('touchstart', handleTouchStart);
+    drawer.removeEventListener('touchmove', handleTouchMove);
+    drawer.removeEventListener('touchend', handleTouchEnd);
+    drawer.removeEventListener('click', handleDrawerClick);
+  }
+
+  function handleTouchStart(e) {
+    if (!isMobile()) return;
+    var touch = e.touches[0];
+    touchStartX = touch.clientX;
+    touchStartY = touch.clientY;
+    touchStartTime = Date.now();
+    isDragging = false;
+    drawerStartX = drawer.getBoundingClientRect().left;
+  }
+
+  function handleTouchMove(e) {
+    if (!isMobile()) return;
+    var touch = e.touches[0];
+    var deltaX = touch.clientX - touchStartX;
+    var deltaY = touch.clientY - touchStartY;
+    
+    // Check if this is a horizontal swipe
+    if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 10) {
+      isDragging = true;
+      
+      // Only allow swipe to close (swipe left)
+      if (deltaX < 0) {
+        e.preventDefault();
+        var translateX = Math.max(deltaX, -drawer.offsetWidth);
+        drawer.style.transform = 'translate3d(' + translateX + 'px, 0, 0)';
+      }
+    }
+  }
+
+  function handleTouchEnd(e) {
+    if (!isMobile() || !isDragging) return;
+    
+    var touch = e.changedTouches[0];
+    var deltaX = touch.clientX - touchStartX;
+    var deltaTime = Date.now() - touchStartTime;
+    
+    // Reset transform
+    drawer.style.transform = '';
+    
+    // Check if swipe was fast enough or far enough to close
+    var swipeThreshold = 100;
+    var velocityThreshold = 0.3;
+    var velocity = Math.abs(deltaX) / deltaTime;
+    
+    if (deltaX < -swipeThreshold || velocity > velocityThreshold) {
+      closeDrawer();
+    }
+    
+    isDragging = false;
+  }
+
+  function handleDrawerClick(e) {
+    if (!isMobile()) return;
+    
+    // Check if click is on empty area (not on links or buttons)
+    var target = e.target;
+    var isClickable = target.closest('a') || target.closest('button') || target.closest('.cp-sb__close');
+    
+    if (!isClickable) {
+      closeDrawer();
+    }
+  }
   if (closeBtn) closeBtn.addEventListener('click', closeDrawer, false);
   document.addEventListener('keydown', function(e){
     var k = e.key || e.keyCode; if (k === 'Escape' || k === 'Esc' || k === 27) closeDrawer();

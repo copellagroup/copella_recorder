@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Copella UI (NextGen)
  * Description: Sidebar + Header with search. High-quality, low-jank. Mini rail on desktop with burger control. Burger drawer on mobile. Accessible and performant.
- * Version: 2.3.1
+ * Version: 2.4.0
  * Author: Copella
  */
 
