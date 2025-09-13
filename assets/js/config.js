@@ -16,7 +16,7 @@ window.CopellaConfig = {
   STORAGE_KEYS: {
     stations: 'copellaStations_v1',
     lastPlayed: 'copellaLastPlayed_v1',
-    welcomeSeen: 'copellaWelcomeSeen_v1',
+    welcomeSeen: 'copellaWelcomeSeen_v1_1',
     schedules: 'copellaSchedules_v1',
     volume: 'copellaVolume_v1',
     recordingFormat: 'copellaRecordingFormat_v1'

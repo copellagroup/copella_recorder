@@ -41,9 +41,19 @@ window.CopellaModals = (function(){
   }
   function openWelcomeModal() {
     var content = '<div class="modal-content bg-panel-bg p-6 rounded-large w-full max-w-md transform scale-95 transition-transform duration-300">' +
-      '<div class="text-center mb-4"><h2 class="text-xl font-bold">Добро пожаловать в Copella Recorder 1.0!</h2></div>' +
-      '<div class="text-text-secondary space-y-4 text-center"><p>Это первый стабильный релиз с множеством улучшений!</p><p>Главное: <strong>обработка записей теперь не «вешает» приложение!</strong> Конвертация происходит в фоновом режиме с индикатором прогресса. Появился импорт/экспорт и другие полезные функции.</p></div>' +
-      '<button id="closeWelcomeBtn" class="w-full p-3 text-base font-bold rounded-small border-none bg-accent text-bg-color cursor-pointer mt-6">Начать пользоваться</button></div>';
+      '<div class="text-center mb-4"><h2 class="text-xl font-bold">🎉 Copella Recorder v1.1 - Обновление!</h2></div>' +
+      '<div class="text-text-secondary space-y-4 text-center">' +
+        '<p class="font-semibold text-accent-green">Что нового в версии 1.1:</p>' +
+        '<div class="space-y-3 text-left">' +
+          '<div class="flex items-start gap-2"><span class="text-accent-green font-bold">•</span><span><strong>Волновая анимация</strong> - новый эффект для кнопок и элементов</span></div>' +
+          '<div class="flex items-start gap-2"><span class="text-accent-green font-bold">•</span><span><strong>Эффект печатной машинки</strong> - анимированный текст</span></div>' +
+          '<div class="flex items-start gap-2"><span class="text-accent-green font-bold">•</span><span><strong>Красный эквалайзер</strong> при записи</span></div>' +
+          '<div class="flex items-start gap-2"><span class="text-accent-green font-bold">•</span><span><strong>Улучшенные шрифты</strong> - более читаемый текст</span></div>' +
+          '<div class="flex items-start gap-2"><span class="text-accent-green font-bold">•</span><span><strong>Строгий дизайн</strong> - убраны лишние цвета</span></div>' +
+        '</div>' +
+        '<p class="text-sm mt-4">Всего добавлено <strong>10 новых микрофункций</strong> для улучшения пользовательского опыта!</p>' +
+      '</div>' +
+      '<button id="closeWelcomeBtn" class="w-full p-3 text-base font-bold rounded-small border-none bg-accent text-bg-color cursor-pointer mt-6">Понятно, начать!</button></div>';
     CopellaUI.openModal(CopellaDOM.welcomeModal, content);
     CopellaDOM.welcomeModal.querySelector('#closeWelcomeBtn').onclick = function(){ CopellaUI.closeModal(CopellaDOM.welcomeModal); localStorage.setItem(CopellaConfig.STORAGE_KEYS.welcomeSeen, 'true'); };
   }

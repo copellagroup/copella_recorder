@@ -175,6 +175,38 @@ window.CopellaUI = (function(){
     }, 500);
   }
   
+  // Новые функции версии 1.1
+  function createWaveAnimation(element, color) {
+    if (!element) return;
+    var wave = document.createElement('div');
+    wave.className = 'wave-animation absolute inset-0 pointer-elements-none';
+    wave.innerHTML = '<div class="wave w-full h-full border-2 border-current opacity-30 rounded-full animate-ping"></div>';
+    wave.style.color = color || '#FFFFFF';
+    element.style.position = 'relative';
+    element.appendChild(wave);
+    
+    setTimeout(function() {
+      wave.remove();
+    }, 2000);
+    
+    return wave;
+  }
+  
+  function addTypewriterEffect(element, text, speed) {
+    if (!element || !text) return;
+    element.textContent = '';
+    var i = 0;
+    var interval = setInterval(function() {
+      element.textContent += text.charAt(i);
+      i++;
+      if (i >= text.length) {
+        clearInterval(interval);
+      }
+    }, speed || 50);
+    
+    return interval;
+  }
+  
   return { 
     haptic: haptic, 
     showToast: showToast, 
@@ -193,6 +225,8 @@ window.CopellaUI = (function(){
     addGlowEffect: addGlowEffect,
     removeGlowEffect: removeGlowEffect,
     createLoadingSpinner: createLoadingSpinner,
-    addShakeEffect: addShakeEffect
+    addShakeEffect: addShakeEffect,
+    createWaveAnimation: createWaveAnimation,
+    addTypewriterEffect: addTypewriterEffect
   };
 })();
