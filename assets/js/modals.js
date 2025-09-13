@@ -59,30 +59,24 @@ window.CopellaModals = (function(){
   }
   function openSettingsModal() {
     var currentFormat = CopellaStorage.getRecordingFormat();
-    var content = '<div class="modal-content bg-panel-bg p-6 rounded-large w-full max-w-md transform scale-95 transition-transform duration-300 flex flex-col">' +
-      '<div class="flex justify-between items-center mb-6 flex-shrink-0"><h2 class="text-xl font-bold">Настройки</h2><button class="close-btn text-2xl text-text-secondary">&times;</button></div>' +
-      '<div class="space-y-6">' +
-      '<div><h3 class="font-bold text-text-primary mb-2">Формат записи</h3><div class="flex flex-col gap-2" id="formatChooser">' +
-      '<label class="flex items-center gap-3 p-3 bg-zinc-800 rounded-medium cursor-pointer"><input type="radio" name="format" value="mp3" class="accent-accent-blue" ' + (currentFormat === 'mp3' ? 'checked' : '') + '><span>MP3 (Рекомендуется, универсальный)</span></label>' +
-      '<label class="flex items-center gap-3 p-3 bg-zinc-800 rounded-medium cursor-pointer"><input type="radio" name="format" value="webm" class="accent-accent-blue" ' + (currentFormat === 'webm' ? 'checked' : '') + '><span>WebM (Быстро, без конвертации)</span></label>' +
-      '</div><p class="text-xs text-text-secondary mt-2">WebM сохраняется мгновенно, но может не поддерживаться на некоторых устройствах.</p></div>' +
-      '<div><h3 class="font-bold text-text-primary mb-2">Профессиональные функции</h3><div class="flex flex-col gap-3">' +
-      '<button id="technicalInfoBtn" class="p-3 text-base font-bold rounded-small border border-border-color bg-zinc-800 text-text-primary cursor-pointer">Техническая информация</button>' +
-      '<button id="exportTechDataBtn" class="p-3 text-base font-bold rounded-small border border-border-color bg-zinc-800 text-text-primary cursor-pointer">Экспорт технических данных</button>' +
+    var content = '<div class="modal-content bg-panel-bg p-5 rounded-large w-full max-w-sm transform scale-95 transition-transform duration-300 flex flex-col">' +
+      '<div class="flex justify-between items-center mb-4 flex-shrink-0"><h2 class="text-lg font-bold">Настройки</h2><button class="close-btn text-xl text-text-secondary">&times;</button></div>' +
+      '<div class="space-y-4">' +
+      '<div><h3 class="font-bold text-text-primary mb-2 text-sm">Формат записи</h3><div class="flex flex-col gap-1" id="formatChooser">' +
+      '<label class="flex items-center gap-2 p-2 bg-zinc-800 rounded-small cursor-pointer text-sm"><input type="radio" name="format" value="mp3" class="accent-accent-blue" ' + (currentFormat === 'mp3' ? 'checked' : '') + '><span>MP3 (универсальный)</span></label>' +
+      '<label class="flex items-center gap-2 p-2 bg-zinc-800 rounded-small cursor-pointer text-sm"><input type="radio" name="format" value="webm" class="accent-accent-blue" ' + (currentFormat === 'webm' ? 'checked' : '') + '><span>WebM (быстро)</span></label>' +
       '</div></div>' +
-      '<div><h3 class="font-bold text-text-primary mb-2">Управление данными</h3><div class="flex flex-col sm:flex-row gap-3">' +
-      '<button id="exportBtn" class="flex-1 p-3 text-base font-bold rounded-small border border-border-color bg-zinc-800 text-text-primary cursor-pointer">Экспорт станций</button>' +
-      '<label class="flex-1 p-3 text-base font-bold rounded-small border border-border-color bg-zinc-800 text-text-primary cursor-pointer text-center">Импорт станций <input type="file" id="importFile" accept=".json" class="hidden"></label>' +
+      '<div><h3 class="font-bold text-text-primary mb-2 text-sm">Данные</h3><div class="flex gap-2">' +
+      '<button id="exportBtn" class="flex-1 p-2 text-sm font-bold rounded-small border border-border-color bg-zinc-800 text-text-primary cursor-pointer">Экспорт</button>' +
+      '<label class="flex-1 p-2 text-sm font-bold rounded-small border border-border-color bg-zinc-800 text-text-primary cursor-pointer text-center">Импорт <input type="file" id="importFile" accept=".json" class="hidden"></label>' +
       '</div></div>' +
-      '<div><h3 class="font-bold text-text-primary mb-2 mt-2">О приложении</h3><div class="space-y-3 text-sm text-text-secondary"><p><strong class="font-semibold text-text-primary">Copella Recorder 1.1</strong> — профессиональное веб-приложение для прослушивания и записи интернет-радио.</p><p class="text-xs text-center pt-4 text-text-secondary/70">© 2025 Copella</p></div></div>' +
+      '<div class="text-center text-xs text-text-secondary pt-2"><strong>Copella Recorder 1.1</strong><br>© 2025 Copella</div>' +
       '</div></div>';
     CopellaUI.openModal(CopellaDOM.settingsModal, content);
     CopellaDOM.settingsModal.querySelector('.close-btn').onclick = function(){ CopellaUI.closeModal(CopellaDOM.settingsModal); };
     CopellaDOM.settingsModal.querySelector('#exportBtn').onclick = exportStations;
     CopellaDOM.settingsModal.querySelector('#importFile').onchange = importStations;
     CopellaDOM.settingsModal.querySelector('#formatChooser').onchange = function(e){ CopellaStorage.saveRecordingFormat(e.target.value); CopellaUI.showToast('Формат записи сохранен!', 'success'); };
-    CopellaDOM.settingsModal.querySelector('#technicalInfoBtn').onclick = function(){ CopellaUI.closeModal(CopellaDOM.settingsModal); CopellaProfessional.showTechnicalInfo(); };
-    CopellaDOM.settingsModal.querySelector('#exportTechDataBtn').onclick = function(){ CopellaProfessional.exportTechnicalData(); };
   }
   function exportStations() {
     if (CopellaState.stations.length === 0) { CopellaUI.showToast('Список станций пуст.', 'warning'); return; }
