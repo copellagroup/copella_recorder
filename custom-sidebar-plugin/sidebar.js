@@ -11,8 +11,11 @@
   var closeBtn = document.querySelector('.cp-sb__close');
   var labels = document.querySelectorAll('.cp-sb__label');
   var bodyEl = document.body;
+  var isPinned = false;
+  function isMobile(){ return (window.innerWidth || 0) <= 768; }
 
   function openDrawer(){
+    if (!isMobile()) return;
     if (!drawer) return;
     drawer.hidden = false; if (scrim) scrim.hidden = false;
     /* Force reflow before adding class to ensure transition on older devices */
@@ -37,10 +40,12 @@
   }
 
   function toggleFrom(el){
+    if (!isMobile()) return;
     var expanded = el.getAttribute('aria-expanded') === 'true';
     if (expanded) closeDrawer(); else openDrawer();
   }
   if (burger) burger.addEventListener('click', function(){
+    if (!isMobile()) return;
     var expanded = burger.getAttribute('aria-expanded') === 'true';
     if (expanded) closeDrawer(); else openDrawer();
   }, false);
@@ -98,14 +103,32 @@
 
         function onEnter(){ tl.play(); setExpandedState(true); }
         function onLeave(){ 
+          if (isPinned) return;
           tl.reverse(); 
           // Delay state change to allow animation to complete
-          setTimeout(function(){ setExpandedState(false); }, 240);
+          setTimeout(function(){ if (!isPinned) setExpandedState(false); }, 240);
         }
         rail.addEventListener('mouseenter', onEnter, false);
         rail.addEventListener('mouseleave', onLeave, false);
 
-        window.addEventListener('resize', function(){ if (window.innerWidth <= 768) { tl.pause(0); setExpandedState(false); } }, false);
+        window.addEventListener('resize', function(){ if (window.innerWidth <= 768) { isPinned = false; tl.pause(0); setExpandedState(false); } }, false);
+
+        // Minimal API for desktop pin/unpin controlled from header toggle
+        try {
+          window.cpSidebar = window.cpSidebar || {};
+          window.cpSidebar.isPinned = function(){ return !!isPinned; };
+          window.cpSidebar.expandPinned = function(){
+            isPinned = true;
+            if (tl) { tl.play(); }
+            setExpandedState(true);
+          };
+          window.cpSidebar.collapsePinned = function(){
+            isPinned = false;
+            if (tl) { tl.reverse(); setTimeout(function(){ if (!isPinned) setExpandedState(false); }, 240); }
+            else { setExpandedState(false); }
+          };
+          window.cpSidebar.togglePinned = function(){ if (isPinned) window.cpSidebar.collapsePinned(); else window.cpSidebar.expandPinned(); };
+        } catch(_){ /* no-op */ }
       } else {
         // Fallback to CSS-driven state toggle for very old browsers (e.g., Lumia IE/Edge legacy)
         function onRailEnter(){ setExpandedState(true); }

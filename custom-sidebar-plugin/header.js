@@ -100,14 +100,21 @@
   if (sidebarToggle) {
     sidebarToggle.addEventListener('click', function(){
       var expanded = sidebarToggle.getAttribute('aria-expanded') === 'true';
-      sidebarToggle.setAttribute('aria-expanded', !expanded);
-      
-      // Toggle sidebar expansion state
-      if (expanded) {
-        root.classList.remove('cp-sb-expanded');
-      } else {
-        root.classList.add('cp-sb-expanded');
-      }
+      var toExpand = !expanded;
+      sidebarToggle.setAttribute('aria-expanded', toExpand);
+
+      // Desktop-only pin/unpin with smooth GSAP via cpSidebar API if available
+      try {
+        if (window.innerWidth > 768 && window.cpSidebar) {
+          if (toExpand) { window.cpSidebar.expandPinned(); }
+          else { window.cpSidebar.collapsePinned(); }
+          return;
+        }
+      } catch(_){ /* no-op */ }
+
+      // Fallback: toggle class directly
+      if (toExpand) { root.classList.add('cp-sb-expanded'); }
+      else { root.classList.remove('cp-sb-expanded'); }
     }, false);
   }
 

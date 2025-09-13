@@ -19,6 +19,14 @@ html.cp-sb-expanded { --cp-sb-left: var(--cp-sb-expanded-w); }
 
 .cp-sb__nav { display: flex; flex-direction: column; gap: 8px; width: 100%; margin-top: 8px; }
 
+/* Hide internal sidebar burger globally (use header burger on mobile instead) */
+.cp-sb__burger { display: none !important; }
+.cp-sb__burger-line { display: none !important; }
+
+/* Hide internal sidebar burger globally (use header burger on mobile instead) */
+.cp-sb__burger { display: none !important; }
+.cp-sb__burger-line { display: none !important; }
+
 .cp-sb__item { display: flex; align-items: center; justify-content: center; padding: 10px 0; color: var(--cp-sb-fg); text-decoration: none; outline: none; border-radius: 10px; min-height: 44px; transition: background .18s ease; box-sizing: border-box; width: 100%; }
 .cp-sb__item:hover, .cp-sb__item:focus { background: #2b2b2b; }
 .cp-sb__icon { display: inline-grid; place-items: center; width: 24px; height: 24px; transition: transform .18s ease; }
@@ -54,6 +62,8 @@ html.cp-sb-expanded .cp-sb__donate, .cp-sb__rail:hover .cp-sb__donate { grid-tem
 /* Disable CSS hover width change when GSAP is driving the animation */
 html:not(.cp-sb-gsap) .cp-sb__rail:hover,
 html:not(.cp-sb-gsap) .cp-sb__rail:focus-within { width: var(--cp-sb-expanded-w); align-items: flex-start; }
+/* When pinned via desktop toggle, expand rail as well (CSS fallback when GSAP inactive) */
+html:not(.cp-sb-gsap).cp-sb-expanded .cp-sb__rail { width: var(--cp-sb-expanded-w); align-items: flex-start; }
 html.cp-sb-expanded .cp-sb__logo, .cp-sb__rail:hover .cp-sb__logo { justify-content: flex-start; padding-left: 24px; }
 html.cp-sb-expanded .cp-sb__item, .cp-sb__rail:hover .cp-sb__item { display: grid; grid-template-columns: 24px 1fr; align-items: center; justify-content: stretch; justify-items: start; padding: 10px 20px; column-gap: 12px; }
 html.cp-sb-expanded .cp-sb__logo--mini, .cp-sb__rail:hover .cp-sb__logo--mini { display: none; }
@@ -75,8 +85,7 @@ html.cp-sb-expanded .cp-sb__label,
   .cp-sb { width: 0; }
   body { padding-left: 0 !important; }
   .cp-sb__rail { display: none; }
-  .cp-sb__burger { display: none !important; }
-  .cp-sb__burger-line { display: none !important; }
+  /* Internal burger remains hidden on mobile; header burger is used */
   .cp-sb__drawer { position: fixed; 
     /* Baseline fallback for very old browsers */
     top: 0; left: 0;
@@ -113,6 +122,12 @@ html.cp-sb-expanded .cp-sb__label,
   
   .cp-sb__drawer .cp-sb__label { display: inline; }
   .cp-sb__drawer .cp-sb__label { opacity: 1; max-width: none; transform: none; }
+}
+
+/* Ensure drawer and scrim are inert on desktop to avoid black overlay */
+@media (min-width: 769px) {
+  .cp-sb__drawer { display: none !important; }
+  .cp-sb__scrim { display: none !important; }
 }
 
 /* Fallbacks for browsers without dynamic viewport units */
