@@ -28,20 +28,24 @@
    - Градиентные фоны для элементов
    - Новые CSS анимации
 
-### Структура плагина (плоская):
+### Структура плагина:
 ```
 copella-recorder/
 ├── copella-recorder.php (основной файл)
-├── app.css (обновленные стили)
-├── player.php (обновленный шаблон)
-├── ui.js (новые микрофункции)
-├── player.js (обновленный плеер)
-├── config.js, dom.js, db.js, export.js
-├── init.js, modals.js, now-playing.js
-├── recording.js, scheduler.js, state.js
-├── stations.js, stats.js, storage.js
-├── stream-info.js, visualizer.js
-├── mp3-encoder.js
+├── assets/
+│   ├── css/
+│   │   └── app.css (обновленные стили)
+│   └── js/
+│       ├── ui.js (новые микрофункции)
+│       ├── player.js (обновленный плеер)
+│       ├── config.js, dom.js, db.js, export.js
+│       ├── init.js, modals.js, now-playing.js
+│       ├── recording.js, scheduler.js, state.js
+│       ├── stations.js, stats.js, storage.js
+│       ├── stream-info.js, visualizer.js
+│       └── mp3-encoder.js
+├── templates/
+│   └── player.php (обновленный шаблон)
 ├── README.md
 └── CHANGELOG.md
 ```
