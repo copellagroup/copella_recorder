@@ -209,31 +209,35 @@ window.CopellaRecording = (function(){
   function updateNewRecordingBadge() { CopellaDOM.newRecordingBadge.classList.toggle('hidden', !CopellaState.hasNewRecordings); }
   function openRecordingsModal() {
     CopellaState.hasNewRecordings = false; updateNewRecordingBadge();
-    var content = '<div class="modal-content bg-panel-bg p-5 rounded-large w-full max-w-2xl transform scale-95 transition-transform duration-300 flex flex-col">'
-      + '<div class="flex justify-between items-center mb-4 flex-shrink-0">'
-      + '<h2 class="text-lg font-bold">Мои Записи</h2>'
-      + '<div class="flex gap-2">'
-      + '<button id="createPlaylistBtn" class="p-2 text-sm font-bold rounded-small border border-border-color bg-accent-purple text-white cursor-pointer">Плейлист</button>'
-      + '<button id="exportBtn" class="p-2 text-sm font-bold rounded-small border border-border-color bg-accent-green text-white cursor-pointer">Экспорт</button>'
-      + '<button id="selectAllBtn" class="p-2 text-sm font-bold rounded-small border border-border-color bg-zinc-800 text-text-primary cursor-pointer">Выбрать все</button>'
-      + '<button id="batchDeleteBtn" class="p-2 text-sm font-bold rounded-small border border-border-color bg-record text-white cursor-pointer hidden">Удалить выбранные</button>'
-      + '<button class="close-btn text-2xl text-text-secondary">&times;</button>'
+    var content = '<div class="modal-content bg-panel-bg p-3 sm:p-5 rounded-large w-full max-w-2xl transform scale-95 transition-transform duration-300 flex flex-col">'
+      + '<div class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 flex-shrink-0 gap-3">'
+      + '<h2 class="text-lg font-bold text-center sm:text-left">Мои Записи</h2>'
+      + '<div class="flex flex-col sm:flex-row gap-2">'
+      + '<div class="flex gap-2 justify-center sm:justify-end">'
+      + '<button id="createPlaylistBtn" class="px-3 py-2 text-xs sm:text-sm font-bold rounded-small border border-border-color bg-accent-purple text-white cursor-pointer flex-shrink-0">Плейлист</button>'
+      + '<button id="exportBtn" class="px-3 py-2 text-xs sm:text-sm font-bold rounded-small border border-border-color bg-accent-green text-white cursor-pointer flex-shrink-0">Экспорт</button>'
+      + '</div>'
+      + '<div class="flex gap-2 justify-center sm:justify-end">'
+      + '<button id="selectAllBtn" class="px-3 py-2 text-xs sm:text-sm font-bold rounded-small border border-border-color bg-zinc-800 text-text-primary cursor-pointer flex-shrink-0">Выбрать все</button>'
+      + '<button id="batchDeleteBtn" class="px-3 py-2 text-xs sm:text-sm font-bold rounded-small border border-border-color bg-record text-white cursor-pointer hidden flex-shrink-0">Удалить</button>'
+      + '<button class="close-btn text-xl sm:text-2xl text-text-secondary px-2">&times;</button>'
+      + '</div>'
       + '</div>'
       + '</div>'
       + '<div class="flex-grow overflow-y-auto"><div id="recordingsList"></div></div>'
-      + '<div id="recordingPlayer" class="hidden mt-4 p-4 bg-zinc-800 rounded-medium flex-shrink-0">'
-      + '<div class="flex items-center gap-4 mb-3">'
-      + '<div id="recordingArt" class="w-12 h-12 rounded-small bg-bg-color overflow-hidden flex-shrink-0"></div>'
-      + '<div class="flex-grow">'
-      + '<div id="recordingTitle" class="font-bold text-sm"></div>'
-      + '<div id="recordingInfo" class="text-xs text-text-secondary"></div>'
+      + '<div id="recordingPlayer" class="hidden mt-4 p-3 sm:p-4 bg-zinc-800 rounded-medium flex-shrink-0">'
+      + '<div class="flex items-center gap-3 sm:gap-4 mb-3">'
+      + '<div id="recordingArt" class="w-10 h-10 sm:w-12 sm:h-12 rounded-small bg-bg-color overflow-hidden flex-shrink-0"></div>'
+      + '<div class="flex-grow min-w-0">'
+      + '<div id="recordingTitle" class="font-bold text-xs sm:text-sm truncate"></div>'
+      + '<div id="recordingInfo" class="text-xs text-text-secondary truncate"></div>'
       + '</div>'
       + '</div>'
-      + '<div class="flex items-center gap-3">'
-      + '<button id="recordingPlayBtn" class="w-10 h-10 bg-accent text-bg-color rounded-full flex justify-center items-center">'
-      + '<svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"></path></svg>'
+      + '<div class="flex items-center gap-2 sm:gap-3">'
+      + '<button id="recordingPlayBtn" class="w-8 h-8 sm:w-10 sm:h-10 bg-accent text-bg-color rounded-full flex justify-center items-center flex-shrink-0">'
+      + '<svg class="w-4 h-4 sm:w-5 sm:h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"></path></svg>'
       + '</button>'
-      + '<div class="flex-grow">'
+      + '<div class="flex-grow min-w-0">'
       + '<div class="w-full bg-border-color rounded-full h-1 mb-1">'
       + '<div id="recordingProgress" class="bg-accent h-1 rounded-full transition-all duration-300" style="width: 0%"></div>'
       + '</div>'
@@ -242,8 +246,8 @@ window.CopellaRecording = (function(){
       + '<span id="recordingDuration">0:00</span>'
       + '</div>'
       + '</div>'
-      + '<button id="recordingVolumeBtn" class="w-10 h-10 bg-white/10 border border-border-color rounded-full flex justify-center items-center">'
-      + '<svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"></path></svg>'
+      + '<button id="recordingVolumeBtn" class="w-8 h-8 sm:w-10 sm:h-10 bg-white/10 border border-border-color rounded-full flex justify-center items-center flex-shrink-0">'
+      + '<svg class="w-4 h-4 sm:w-5 sm:h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"></path></svg>'
       + '</button>'
       + '</div>'
       + '</div>'
@@ -282,13 +286,13 @@ window.CopellaRecording = (function(){
       if (!recordings || recordings.length === 0) { listEl.innerHTML = '<p class="text-center text-text-secondary py-8">У вас пока нет записей</p>'; return; }
       recordings.sort(function(a,b){ return b.id - a.id; }).forEach(function(rec){
         var item = document.createElement('div');
-        item.className = 'flex items-center gap-3 p-2 rounded-medium mb-2 bg-zinc-800';
-        var iconHTML = rec.stationIcon ? '<img src="' + rec.stationIcon + '" class="w-full h-full object-cover">' : CopellaUI.createPlaceholder(rec.stationName, ['text-lg']);
+        item.className = 'flex items-center gap-2 sm:gap-3 p-2 sm:p-3 rounded-medium mb-2 bg-zinc-800';
+        var iconHTML = rec.stationIcon ? '<img src="' + rec.stationIcon + '" class="w-full h-full object-cover">' : CopellaUI.createPlaceholder(rec.stationName, ['text-sm sm:text-lg']);
         var date = new Date(rec.date); var minutes = Math.floor(rec.duration / 60); var seconds = rec.duration % 60; var fileExtension = rec.blob.type && rec.blob.type.indexOf('mpeg') > -1 ? 'mp3' : 'webm';
-        item.innerHTML = '<div class="custom-checkbox w-4 h-4 rounded border-2 border-border-color flex items-center justify-center cursor-pointer" data-id="' + rec.id + '"><div class="w-2 h-2 bg-accent rounded-sm hidden"></div></div>' +
-          '<div class="w-10 h-10 flex-shrink-0 rounded-small overflow-hidden bg-bg-color">' + iconHTML + '</div>' +
-          '<div class="flex-grow overflow-hidden"><p class="font-bold text-sm truncate" title="' + rec.stationName + '">' + rec.stationName + '</p><p class="text-xs text-text-secondary">' + date.toLocaleDateString() + ' • ' + minutes + 'м ' + seconds + 'с • <span class="uppercase font-semibold">' + fileExtension + '</span></p></div>' +
-          '<div class="flex-shrink-0 flex gap-1"><button data-id="' + rec.id + '" class="play-rec-btn p-2 rounded-full text-text-secondary hover:bg-white/10 hover:text-accent transition-colors" title="Прослушать">' + CopellaConfig.ICONS.play + '</button><button data-id="' + rec.id + '" class="download-rec-btn p-2 rounded-full text-text-secondary hover:bg-white/10 hover:text-accent-green transition-colors" title="Скачать">' + CopellaConfig.ICONS.download + '</button><button data-id="' + rec.id + '" class="delete-rec-btn p-2 rounded-full text-text-secondary hover:bg-white/10 hover:text-record transition-colors" title="Удалить">' + CopellaConfig.ICONS.trash + '</button></div>';
+        item.innerHTML = '<div class="custom-checkbox w-4 h-4 rounded border-2 border-border-color flex items-center justify-center cursor-pointer flex-shrink-0" data-id="' + rec.id + '"><div class="w-2 h-2 bg-accent rounded-sm hidden"></div></div>' +
+          '<div class="w-8 h-8 sm:w-10 sm:h-10 flex-shrink-0 rounded-small overflow-hidden bg-bg-color">' + iconHTML + '</div>' +
+          '<div class="flex-grow overflow-hidden min-w-0"><p class="font-bold text-xs sm:text-sm truncate" title="' + rec.stationName + '">' + rec.stationName + '</p><p class="text-xs text-text-secondary truncate">' + date.toLocaleDateString() + ' • ' + minutes + 'м ' + seconds + 'с • <span class="uppercase font-semibold">' + fileExtension + '</span></p></div>' +
+          '<div class="flex-shrink-0 flex gap-1"><button data-id="' + rec.id + '" class="play-rec-btn p-1.5 sm:p-2 rounded-full text-text-secondary hover:bg-white/10 hover:text-accent transition-colors" title="Прослушать">' + CopellaConfig.ICONS.play + '</button><button data-id="' + rec.id + '" class="download-rec-btn p-1.5 sm:p-2 rounded-full text-text-secondary hover:bg-white/10 hover:text-accent-green transition-colors" title="Скачать">' + CopellaConfig.ICONS.download + '</button><button data-id="' + rec.id + '" class="delete-rec-btn p-1.5 sm:p-2 rounded-full text-text-secondary hover:bg-white/10 hover:text-record transition-colors" title="Удалить">' + CopellaConfig.ICONS.trash + '</button></div>';
         listEl.appendChild(item);
       });
       Array.prototype.forEach.call(document.querySelectorAll('.play-rec-btn'), function(btn){ btn.onclick = function(e){ playRecording(parseInt(e.currentTarget.dataset.id)); }; });
