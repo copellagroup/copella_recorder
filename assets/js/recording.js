@@ -243,7 +243,7 @@ window.CopellaRecording = (function(){
         item.className = 'flex items-center gap-3 p-2 rounded-medium mb-2 bg-zinc-800';
         var iconHTML = rec.stationIcon ? '<img src="' + rec.stationIcon + '" class="w-full h-full object-cover">' : CopellaUI.createPlaceholder(rec.stationName, ['text-lg']);
         var date = new Date(rec.date); var minutes = Math.floor(rec.duration / 60); var seconds = rec.duration % 60; var fileExtension = rec.blob.type && rec.blob.type.indexOf('mpeg') > -1 ? 'mp3' : 'webm';
-        item.innerHTML = '<input type="checkbox" data-id="' + rec.id + '" class="recording-checkbox w-4 h-4 accent-accent-purple">' +
+        item.innerHTML = '<div class="custom-checkbox w-4 h-4 rounded border-2 border-border-color flex items-center justify-center cursor-pointer" data-id="' + rec.id + '"><div class="w-2 h-2 bg-accent rounded-sm hidden"></div></div>' +
           '<div class="w-10 h-10 flex-shrink-0 rounded-small overflow-hidden bg-bg-color">' + iconHTML + '</div>' +
           '<div class="flex-grow overflow-hidden"><p class="font-bold text-sm truncate" title="' + rec.stationName + '">' + rec.stationName + '</p><p class="text-xs text-text-secondary">' + date.toLocaleDateString() + ' • ' + minutes + 'м ' + seconds + 'с • <span class="uppercase font-semibold">' + fileExtension + '</span></p></div>' +
           '<div class="flex-shrink-0 flex gap-1"><button data-id="' + rec.id + '" class="play-rec-btn p-2 rounded-full text-text-secondary hover:bg-white/10 hover:text-accent transition-colors" title="Прослушать">' + CopellaConfig.ICONS.play + '</button><button data-id="' + rec.id + '" class="download-rec-btn p-2 rounded-full text-text-secondary hover:bg-white/10 hover:text-accent-green transition-colors" title="Скачать">' + CopellaConfig.ICONS.download + '</button><button data-id="' + rec.id + '" class="delete-rec-btn p-2 rounded-full text-text-secondary hover:bg-white/10 hover:text-record transition-colors" title="Удалить">' + CopellaConfig.ICONS.trash + '</button></div>';
@@ -416,7 +416,7 @@ window.CopellaRecording = (function(){
   }
   
   function formatTime(seconds) {
-    if (isNaN(seconds)) return '0:00';
+    if (isNaN(seconds) || !isFinite(seconds) || seconds < 0) return '0:00';
     var mins = Math.floor(seconds / 60);
     var secs = Math.floor(seconds % 60);
     return mins + ':' + (secs < 10 ? '0' : '') + secs;
@@ -435,21 +435,42 @@ window.CopellaRecording = (function(){
       batchDeleteBtn.onclick = function() { batchDeleteRecordings(); };
     }
     
-    // Обработчики для чекбоксов
+    // Обработчики для кастомных чекбоксов
     setTimeout(function() {
-      Array.prototype.forEach.call(document.querySelectorAll('.recording-checkbox'), function(checkbox) {
-        checkbox.onchange = function() { updateBatchButtons(); };
+      Array.prototype.forEach.call(document.querySelectorAll('.custom-checkbox'), function(checkbox) {
+        checkbox.onclick = function() {
+          var dot = this.querySelector('div');
+          var isChecked = !dot.classList.contains('hidden');
+          if (isChecked) {
+            dot.classList.add('hidden');
+            this.classList.remove('border-accent');
+          } else {
+            dot.classList.remove('hidden');
+            this.classList.add('border-accent');
+          }
+          updateBatchButtons();
+        };
       });
     }, 100);
   }
   
   function toggleSelectAll() {
-    var checkboxes = document.querySelectorAll('.recording-checkbox');
+    var checkboxes = document.querySelectorAll('.custom-checkbox');
     var selectAllBtn = document.getElementById('selectAllBtn');
-    var allChecked = Array.prototype.every.call(checkboxes, function(cb) { return cb.checked; });
+    var allChecked = Array.prototype.every.call(checkboxes, function(cb) { 
+      var dot = cb.querySelector('div');
+      return !dot.classList.contains('hidden');
+    });
     
     Array.prototype.forEach.call(checkboxes, function(checkbox) {
-      checkbox.checked = !allChecked;
+      var dot = checkbox.querySelector('div');
+      if (allChecked) {
+        dot.classList.add('hidden');
+        checkbox.classList.remove('border-accent');
+      } else {
+        dot.classList.remove('hidden');
+        checkbox.classList.add('border-accent');
+      }
     });
     
     if (selectAllBtn) {
@@ -460,8 +481,11 @@ window.CopellaRecording = (function(){
   }
   
   function updateBatchButtons() {
-    var checkboxes = document.querySelectorAll('.recording-checkbox');
-    var checkedCount = Array.prototype.filter.call(checkboxes, function(cb) { return cb.checked; }).length;
+    var checkboxes = document.querySelectorAll('.custom-checkbox');
+    var checkedCount = Array.prototype.filter.call(checkboxes, function(cb) { 
+      var dot = cb.querySelector('div');
+      return !dot.classList.contains('hidden');
+    }).length;
     var batchDeleteBtn = document.getElementById('batchDeleteBtn');
     
     if (batchDeleteBtn) {
@@ -475,7 +499,10 @@ window.CopellaRecording = (function(){
   }
   
   function batchDeleteRecordings() {
-    var checkboxes = document.querySelectorAll('.recording-checkbox:checked');
+    var checkboxes = Array.prototype.filter.call(document.querySelectorAll('.custom-checkbox'), function(cb) {
+      var dot = cb.querySelector('div');
+      return !dot.classList.contains('hidden');
+    });
     if (checkboxes.length === 0) return;
     
     var confirmMsg = 'Вы уверены, что хотите удалить ' + checkboxes.length + ' записей?';

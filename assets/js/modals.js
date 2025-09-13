@@ -63,8 +63,8 @@ window.CopellaModals = (function(){
       '<div class="flex justify-between items-center mb-4 flex-shrink-0"><h2 class="text-lg font-bold">Настройки</h2><button class="close-btn text-xl text-text-secondary">&times;</button></div>' +
       '<div class="space-y-4">' +
       '<div><h3 class="font-bold text-text-primary mb-2 text-sm">Формат записи</h3><div class="flex flex-col gap-1" id="formatChooser">' +
-      '<label class="flex items-center gap-2 p-2 bg-zinc-800 rounded-small cursor-pointer text-sm"><input type="radio" name="format" value="mp3" class="accent-accent-blue" ' + (currentFormat === 'mp3' ? 'checked' : '') + '><span>MP3 (универсальный)</span></label>' +
-      '<label class="flex items-center gap-2 p-2 bg-zinc-800 rounded-small cursor-pointer text-sm"><input type="radio" name="format" value="webm" class="accent-accent-blue" ' + (currentFormat === 'webm' ? 'checked' : '') + '><span>WebM (быстро)</span></label>' +
+      '<div class="flex items-center gap-2 p-2 bg-zinc-800 rounded-small cursor-pointer text-sm" data-format="mp3"><div class="custom-radio w-4 h-4 rounded-full border-2 border-border-color flex items-center justify-center ' + (currentFormat === 'mp3' ? 'border-accent' : '') + '"><div class="w-2 h-2 rounded-full bg-accent ' + (currentFormat === 'mp3' ? '' : 'hidden') + '"></div></div><span>MP3 (универсальный)</span></div>' +
+      '<div class="flex items-center gap-2 p-2 bg-zinc-800 rounded-small cursor-pointer text-sm" data-format="webm"><div class="custom-radio w-4 h-4 rounded-full border-2 border-border-color flex items-center justify-center ' + (currentFormat === 'webm' ? 'border-accent' : '') + '"><div class="w-2 h-2 rounded-full bg-accent ' + (currentFormat === 'webm' ? '' : 'hidden') + '"></div></div><span>WebM (быстро)</span></div>' +
       '</div></div>' +
       '<div><h3 class="font-bold text-text-primary mb-2 text-sm">Данные</h3><div class="flex gap-2">' +
       '<button id="exportBtn" class="flex-1 p-2 text-sm font-bold rounded-small border border-border-color bg-zinc-800 text-text-primary cursor-pointer">Экспорт</button>' +
@@ -76,7 +76,26 @@ window.CopellaModals = (function(){
     CopellaDOM.settingsModal.querySelector('.close-btn').onclick = function(){ CopellaUI.closeModal(CopellaDOM.settingsModal); };
     CopellaDOM.settingsModal.querySelector('#exportBtn').onclick = exportStations;
     CopellaDOM.settingsModal.querySelector('#importFile').onchange = importStations;
-    CopellaDOM.settingsModal.querySelector('#formatChooser').onchange = function(e){ CopellaStorage.saveRecordingFormat(e.target.value); CopellaUI.showToast('Формат записи сохранен!', 'success'); };
+    // Обработчики для кастомных радио-кнопок
+    Array.prototype.forEach.call(CopellaDOM.settingsModal.querySelectorAll('[data-format]'), function(item){
+      item.onclick = function(){
+        var format = this.dataset.format;
+        // Обновляем визуальное состояние
+        Array.prototype.forEach.call(CopellaDOM.settingsModal.querySelectorAll('[data-format]'), function(otherItem){
+          var radio = otherItem.querySelector('.custom-radio');
+          var dot = radio.querySelector('div');
+          radio.classList.remove('border-accent');
+          dot.classList.add('hidden');
+        });
+        var radio = this.querySelector('.custom-radio');
+        var dot = radio.querySelector('div');
+        radio.classList.add('border-accent');
+        dot.classList.remove('hidden');
+        // Сохраняем настройку
+        CopellaStorage.saveRecordingFormat(format);
+        CopellaUI.showToast('Формат записи сохранен!', 'success');
+      };
+    });
   }
   function exportStations() {
     if (CopellaState.stations.length === 0) { CopellaUI.showToast('Список станций пуст.', 'warning'); return; }
