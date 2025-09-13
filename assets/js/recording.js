@@ -107,16 +107,51 @@ window.CopellaRecording = (function(){
   function updateNewRecordingBadge() { CopellaDOM.newRecordingBadge.classList.toggle('hidden', !CopellaState.hasNewRecordings); }
   function openRecordingsModal() {
     CopellaState.hasNewRecordings = false; updateNewRecordingBadge();
-    var content = '<div class="modal-content bg-panel-bg p-5 rounded-large w-full max-w-lg transform scale-95 transition-transform duration-300 flex flex-col">'
+    var content = '<div class="modal-content bg-panel-bg p-5 rounded-large w-full max-w-2xl transform scale-95 transition-transform duration-300 flex flex-col">'
       + '<div class="flex justify-between items-center mb-4 flex-shrink-0">'
       + '<h2 class="text-lg font-bold">Мои Записи</h2>'
+      + '<div class="flex gap-2">'
+      + '<button id="selectAllBtn" class="p-2 text-sm font-bold rounded-small border border-border-color bg-zinc-800 text-text-primary cursor-pointer">Выбрать все</button>'
+      + '<button id="batchDeleteBtn" class="p-2 text-sm font-bold rounded-small border border-border-color bg-record text-white cursor-pointer hidden">Удалить выбранные</button>'
       + '<button class="close-btn text-2xl text-text-secondary">&times;</button>'
       + '</div>'
+      + '</div>'
       + '<div class="flex-grow overflow-y-auto"><div id="recordingsList"></div></div>'
+      + '<div id="recordingPlayer" class="hidden mt-4 p-4 bg-zinc-800 rounded-medium flex-shrink-0">'
+      + '<div class="flex items-center gap-4 mb-3">'
+      + '<div id="recordingArt" class="w-12 h-12 rounded-small bg-bg-color overflow-hidden flex-shrink-0"></div>'
+      + '<div class="flex-grow">'
+      + '<div id="recordingTitle" class="font-bold text-sm"></div>'
+      + '<div id="recordingInfo" class="text-xs text-text-secondary"></div>'
+      + '</div>'
+      + '</div>'
+      + '<div class="flex items-center gap-3">'
+      + '<button id="recordingPlayBtn" class="w-10 h-10 bg-accent text-bg-color rounded-full flex justify-center items-center">'
+      + '<svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"></path></svg>'
+      + '</button>'
+      + '<div class="flex-grow">'
+      + '<div class="w-full bg-border-color rounded-full h-1 mb-1">'
+      + '<div id="recordingProgress" class="bg-accent h-1 rounded-full transition-all duration-300" style="width: 0%"></div>'
+      + '</div>'
+      + '<div class="flex justify-between text-xs text-text-secondary">'
+      + '<span id="recordingCurrentTime">0:00</span>'
+      + '<span id="recordingDuration">0:00</span>'
+      + '</div>'
+      + '</div>'
+      + '<button id="recordingVolumeBtn" class="w-10 h-10 bg-white/10 border border-border-color rounded-full flex justify-center items-center">'
+      + '<svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"></path></svg>'
+      + '</button>'
+      + '</div>'
+      + '</div>'
       + '</div>';
     CopellaUI.openModal(CopellaDOM.recordingsModal, content);
     renderRecordingsList();
-    CopellaDOM.recordingsModal.querySelector('.close-btn').onclick = function(){ CopellaUI.closeModal(CopellaDOM.recordingsModal); };
+    setupRecordingPlayer();
+    setupBatchOperations();
+    CopellaDOM.recordingsModal.querySelector('.close-btn').onclick = function(){ 
+      stopRecordingPlayback();
+      CopellaUI.closeModal(CopellaDOM.recordingsModal); 
+    };
   }
   function renderRecordingsList() {
     var listEl = document.getElementById('recordingsList'); if (!listEl) return;
@@ -128,16 +163,259 @@ window.CopellaRecording = (function(){
         item.className = 'flex items-center gap-3 p-2 rounded-medium mb-2 bg-zinc-800';
         var iconHTML = rec.stationIcon ? '<img src="' + rec.stationIcon + '" class="w-full h-full object-cover">' : CopellaUI.createPlaceholder(rec.stationName, ['text-lg']);
         var date = new Date(rec.date); var minutes = Math.floor(rec.duration / 60); var seconds = rec.duration % 60; var fileExtension = rec.blob.type && rec.blob.type.indexOf('mpeg') > -1 ? 'mp3' : 'webm';
-        item.innerHTML = '<div class="w-10 h-10 flex-shrink-0 rounded-small overflow-hidden bg-bg-color">' + iconHTML + '</div>' +
+        item.innerHTML = '<input type="checkbox" data-id="' + rec.id + '" class="recording-checkbox w-4 h-4 accent-accent-purple">' +
+          '<div class="w-10 h-10 flex-shrink-0 rounded-small overflow-hidden bg-bg-color">' + iconHTML + '</div>' +
           '<div class="flex-grow overflow-hidden"><p class="font-bold text-sm truncate" title="' + rec.stationName + '">' + rec.stationName + '</p><p class="text-xs text-text-secondary">' + date.toLocaleDateString() + ' • ' + minutes + 'м ' + seconds + 'с • <span class="uppercase font-semibold">' + fileExtension + '</span></p></div>' +
-          '<div class="flex-shrink-0 flex gap-1"><button data-id="' + rec.id + '" class="download-rec-btn p-2 rounded-full text-text-secondary hover:bg-white/10 hover:text-accent-green transition-colors" title="Скачать">' + CopellaConfig.ICONS.download + '</button><button data-id="' + rec.id + '" class="delete-rec-btn p-2 rounded-full text-text-secondary hover:bg-white/10 hover:text-record transition-colors" title="Удалить">' + CopellaConfig.ICONS.trash + '</button></div>';
+          '<div class="flex-shrink-0 flex gap-1"><button data-id="' + rec.id + '" class="play-rec-btn p-2 rounded-full text-text-secondary hover:bg-white/10 hover:text-accent transition-colors" title="Прослушать">' + CopellaConfig.ICONS.play + '</button><button data-id="' + rec.id + '" class="download-rec-btn p-2 rounded-full text-text-secondary hover:bg-white/10 hover:text-accent-green transition-colors" title="Скачать">' + CopellaConfig.ICONS.download + '</button><button data-id="' + rec.id + '" class="delete-rec-btn p-2 rounded-full text-text-secondary hover:bg-white/10 hover:text-record transition-colors" title="Удалить">' + CopellaConfig.ICONS.trash + '</button></div>';
         listEl.appendChild(item);
       });
+      Array.prototype.forEach.call(document.querySelectorAll('.play-rec-btn'), function(btn){ btn.onclick = function(e){ playRecording(parseInt(e.currentTarget.dataset.id)); }; });
       Array.prototype.forEach.call(document.querySelectorAll('.download-rec-btn'), function(btn){ btn.onclick = function(e){ downloadRecording(parseInt(e.currentTarget.dataset.id)); }; });
       Array.prototype.forEach.call(document.querySelectorAll('.delete-rec-btn'), function(btn){ var id = parseInt(btn.dataset.id); btn.onclick = function(e){ e.stopPropagation(); btn.innerHTML = CopellaConfig.ICONS.confirm; var original = btn.onclick; btn.onclick = function(ev){ ev.stopPropagation(); deleteRecording(id); }; setTimeout(function(){ btn.innerHTML = CopellaConfig.ICONS.trash; btn.onclick = original; }, 3000); }; });
     });
   }
   function downloadRecording(id) { CopellaDB.getRecording(id).then(function(rec){ if (!rec) return; var ext = rec.blob.type && rec.blob.type.indexOf('mpeg') > -1 ? 'mp3' : 'webm'; var a = document.createElement('a'); a.href = URL.createObjectURL(rec.blob); a.download = 'rec_' + rec.stationName.replace(/\s/g, '_') + '_' + new Date(rec.date).toISOString().slice(0,19).replace(/T|:/g, '-') + '.' + ext; a.click(); URL.revokeObjectURL(a.href); }); }
   function deleteRecording(id) { CopellaDB.deleteRecording(id).then(function(){ renderRecordingsList(); CopellaUI.showToast('Запись удалена.', 'info'); }); }
-  return { toggleRecording: toggleRecording, openRecordingsModal: openRecordingsModal };
+  
+  // Функции для работы с аудиоплеером записей
+  var recordingPlayer = null;
+  var currentRecording = null;
+  var recordingProgressInterval = null;
+  
+  function setupRecordingPlayer() {
+    recordingPlayer = document.createElement('audio');
+    recordingPlayer.preload = 'metadata';
+    
+    var playBtn = document.getElementById('recordingPlayBtn');
+    var volumeBtn = document.getElementById('recordingVolumeBtn');
+    
+    if (playBtn) {
+      playBtn.onclick = function() { toggleRecordingPlayback(); };
+    }
+    
+    if (volumeBtn) {
+      volumeBtn.onclick = function() { 
+        recordingPlayer.muted = !recordingPlayer.muted; 
+        updateRecordingVolumeUI(); 
+      };
+    }
+    
+    recordingPlayer.addEventListener('timeupdate', updateRecordingProgress);
+    recordingPlayer.addEventListener('loadedmetadata', function() {
+      updateRecordingDuration();
+    });
+    recordingPlayer.addEventListener('ended', function() {
+      stopRecordingPlayback();
+    });
+  }
+  
+  function playRecording(id) {
+    CopellaDB.getRecording(id).then(function(rec) {
+      if (!rec) return;
+      
+      stopRecordingPlayback();
+      currentRecording = rec;
+      
+      var url = URL.createObjectURL(rec.blob);
+      recordingPlayer.src = url;
+      
+      // Обновляем UI плеера
+      var artEl = document.getElementById('recordingArt');
+      var titleEl = document.getElementById('recordingTitle');
+      var infoEl = document.getElementById('recordingInfo');
+      var playerEl = document.getElementById('recordingPlayer');
+      
+      if (artEl) {
+        artEl.innerHTML = rec.stationIcon ? '<img src="' + rec.stationIcon + '" class="w-full h-full object-cover">' : CopellaUI.createPlaceholder(rec.stationName, ['text-lg']);
+      }
+      
+      if (titleEl) {
+        titleEl.textContent = rec.stationName;
+      }
+      
+      if (infoEl) {
+        var date = new Date(rec.date);
+        var minutes = Math.floor(rec.duration / 60);
+        var seconds = rec.duration % 60;
+        var fileExtension = rec.blob.type && rec.blob.type.indexOf('mpeg') > -1 ? 'mp3' : 'webm';
+        infoEl.textContent = date.toLocaleDateString() + ' • ' + minutes + 'м ' + seconds + 'с • ' + fileExtension.toUpperCase();
+      }
+      
+      if (playerEl) {
+        playerEl.classList.remove('hidden');
+      }
+      
+      recordingPlayer.play().catch(function(err) {
+        console.error('Ошибка воспроизведения записи:', err);
+        CopellaUI.showToast('Не удалось воспроизвести запись', 'error');
+      });
+    });
+  }
+  
+  function toggleRecordingPlayback() {
+    if (!recordingPlayer || !currentRecording) return;
+    
+    if (recordingPlayer.paused) {
+      recordingPlayer.play().catch(function(err) {
+        console.error('Ошибка воспроизведения:', err);
+        CopellaUI.showToast('Ошибка воспроизведения записи', 'error');
+      });
+    } else {
+      recordingPlayer.pause();
+    }
+  }
+  
+  function stopRecordingPlayback() {
+    if (recordingPlayer) {
+      recordingPlayer.pause();
+      recordingPlayer.currentTime = 0;
+      recordingPlayer.src = '';
+    }
+    
+    if (recordingProgressInterval) {
+      clearInterval(recordingProgressInterval);
+      recordingProgressInterval = null;
+    }
+    
+    updateRecordingPlayButton();
+    updateRecordingProgress();
+    
+    var playerEl = document.getElementById('recordingPlayer');
+    if (playerEl) {
+      playerEl.classList.add('hidden');
+    }
+    
+    currentRecording = null;
+  }
+  
+  function updateRecordingProgress() {
+    if (!recordingPlayer) return;
+    
+    var progressEl = document.getElementById('recordingProgress');
+    var currentTimeEl = document.getElementById('recordingCurrentTime');
+    
+    if (progressEl && recordingPlayer.duration) {
+      var progress = (recordingPlayer.currentTime / recordingPlayer.duration) * 100;
+      progressEl.style.width = progress + '%';
+    }
+    
+    if (currentTimeEl) {
+      currentTimeEl.textContent = formatTime(recordingPlayer.currentTime);
+    }
+    
+    updateRecordingPlayButton();
+  }
+  
+  function updateRecordingDuration() {
+    var durationEl = document.getElementById('recordingDuration');
+    if (durationEl && recordingPlayer.duration) {
+      durationEl.textContent = formatTime(recordingPlayer.duration);
+    }
+  }
+  
+  function updateRecordingPlayButton() {
+    var playBtn = document.getElementById('recordingPlayBtn');
+    if (!playBtn) return;
+    
+    var icon = recordingPlayer && !recordingPlayer.paused ? 
+      '<svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"></path></svg>' :
+      '<svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"></path></svg>';
+    
+    playBtn.innerHTML = icon;
+  }
+  
+  function updateRecordingVolumeUI() {
+    var volumeBtn = document.getElementById('recordingVolumeBtn');
+    if (!volumeBtn || !recordingPlayer) return;
+    
+    var icon = recordingPlayer.muted ? 
+      '<svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"></path></svg>' :
+      '<svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"></path></svg>';
+    
+    volumeBtn.innerHTML = icon;
+  }
+  
+  function formatTime(seconds) {
+    if (isNaN(seconds)) return '0:00';
+    var mins = Math.floor(seconds / 60);
+    var secs = Math.floor(seconds % 60);
+    return mins + ':' + (secs < 10 ? '0' : '') + secs;
+  }
+  
+  // Функции для массовых операций
+  function setupBatchOperations() {
+    var selectAllBtn = document.getElementById('selectAllBtn');
+    var batchDeleteBtn = document.getElementById('batchDeleteBtn');
+    
+    if (selectAllBtn) {
+      selectAllBtn.onclick = function() { toggleSelectAll(); };
+    }
+    
+    if (batchDeleteBtn) {
+      batchDeleteBtn.onclick = function() { batchDeleteRecordings(); };
+    }
+    
+    // Обработчики для чекбоксов
+    setTimeout(function() {
+      Array.prototype.forEach.call(document.querySelectorAll('.recording-checkbox'), function(checkbox) {
+        checkbox.onchange = function() { updateBatchButtons(); };
+      });
+    }, 100);
+  }
+  
+  function toggleSelectAll() {
+    var checkboxes = document.querySelectorAll('.recording-checkbox');
+    var selectAllBtn = document.getElementById('selectAllBtn');
+    var allChecked = Array.prototype.every.call(checkboxes, function(cb) { return cb.checked; });
+    
+    Array.prototype.forEach.call(checkboxes, function(checkbox) {
+      checkbox.checked = !allChecked;
+    });
+    
+    if (selectAllBtn) {
+      selectAllBtn.textContent = allChecked ? 'Выбрать все' : 'Снять все';
+    }
+    
+    updateBatchButtons();
+  }
+  
+  function updateBatchButtons() {
+    var checkboxes = document.querySelectorAll('.recording-checkbox');
+    var checkedCount = Array.prototype.filter.call(checkboxes, function(cb) { return cb.checked; }).length;
+    var batchDeleteBtn = document.getElementById('batchDeleteBtn');
+    
+    if (batchDeleteBtn) {
+      if (checkedCount > 0) {
+        batchDeleteBtn.classList.remove('hidden');
+        batchDeleteBtn.textContent = 'Удалить выбранные (' + checkedCount + ')';
+      } else {
+        batchDeleteBtn.classList.add('hidden');
+      }
+    }
+  }
+  
+  function batchDeleteRecordings() {
+    var checkboxes = document.querySelectorAll('.recording-checkbox:checked');
+    if (checkboxes.length === 0) return;
+    
+    var confirmMsg = 'Вы уверены, что хотите удалить ' + checkboxes.length + ' записей?';
+    if (!confirm(confirmMsg)) return;
+    
+    var deletePromises = [];
+    Array.prototype.forEach.call(checkboxes, function(checkbox) {
+      var id = parseInt(checkbox.dataset.id);
+      deletePromises.push(CopellaDB.deleteRecording(id));
+    });
+    
+    Promise.all(deletePromises).then(function() {
+      renderRecordingsList();
+      setupBatchOperations();
+      CopellaUI.showToast('Записи удалены', 'success');
+    }).catch(function(err) {
+      console.error('Ошибка массового удаления:', err);
+      CopellaUI.showToast('Ошибка при удалении записей', 'error');
+    });
+  }
+  
+  return { toggleRecording: toggleRecording, openRecordingsModal: openRecordingsModal, playRecording: playRecording, stopRecordingPlayback: stopRecordingPlayback };
 })();
